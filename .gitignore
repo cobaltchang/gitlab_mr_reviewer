@@ -48,9 +48,8 @@ htmlcov/
 .env.local
 .env.*.local
 
-# Project
+# Project runtime files
 ~/GIT_POOL/reviews/
-state/
 logs/
 *.log
 *.sqlite
