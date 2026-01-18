@@ -1,0 +1,81 @@
+# GitLab MR Reviewer
+
+自動化GitLab MR掃描與本地審查工具。定期掃描 https://ncs-gitlab/ 上的新Merge Requests，自動在本地建立git worktrees，支援增量更新，便於程式碼審查。
+
+## 功能特性
+
+- 🔍 **MR掃描**：自動掃描GitLab上符合條件的Merge Requests
+- 📂 **Worktree管理**：自動建立和管理本地git worktree用於審查
+- 🔄 **增量更新**：支援增量掃描和狀態追蹤
+- 💾 **狀態持久化**：SQLite和JSON雙存儲支持
+- 📝 **完整日誌**：記錄所有操作和錯誤訊息
+- 🛠️ **CLI工具**：簡單易用的命令行界面
+
+## 快速開始
+
+### 安裝
+
+```bash
+# 克隆項目
+git clone <repository_url>
+cd gitlab_mr_reviewer
+
+# 安裝依賴
+pip install -r requirements.txt
+```
+
+### 設定
+
+```bash
+# 複製環境變數範本
+cp .env.example .env
+
+# 編輯 .env 檔案，設定您的 GitLab 連接訊息
+```
+
+### 使用
+
+```bash
+# 掃描MR並建立worktree
+python -m src.main scan
+
+# 列出所有已建立的worktree
+python -m src.main list-worktrees
+
+# 清理指定的worktree
+python -m src.main clean-worktree --iid <MR_IID>
+
+# 試執行模式
+python -m src.main scan --dry-run
+```
+
+## 開發
+
+本項目遵循TDD (Test-Driven Development) 方法論。每個commit都應包含對應的測試，並確保所有測試通過。
+
+詳見 [CONTRIBUTING.md](CONTRIBUTING.md) 了解開發流程和規範。
+
+## 文檔
+
+- [安裝和設定](docs/installation.md)
+- [配置選項](docs/configuration.md)
+- [使用指南](docs/usage.md)
+- [開發貢獻指南](CONTRIBUTING.md)
+- [項目規範](spec.md)
+
+## 測試
+
+```bash
+# 運行所有測試
+pytest
+
+# 運行特定測試
+pytest tests/test_config.py
+
+# 查看覆蓋率
+pytest --cov=src
+```
+
+## 許可證
+
+MIT
