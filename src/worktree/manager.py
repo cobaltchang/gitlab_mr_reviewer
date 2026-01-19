@@ -45,6 +45,7 @@ class WorktreeManager:
             # 檢查worktree是否已存在
             if worktree_path.exists():
                 logger.warning(f"Worktree已存在: {worktree_path}")
+                self.update_worktree(mr_info)
                 return worktree_path
             
             # 建立父目錄
@@ -127,8 +128,14 @@ class WorktreeManager:
             # 改為強制更新
             
             # 執行git pull更新
-            logger.debug(f"執行git pull更新分支 {mr_info.source_branch}")
-            cmd = ['git', '-C', str(worktree_path), 'pull', 'origin', mr_info.source_branch]
+            logger.debug(f"執行git pull更新MR !{mr_info.iid}")
+
+            # 可能有 force update，先回到原本的點
+            cmd = ['git', '-C', str(worktree_path), 'reset', '--hard', mr_info.target_branch]
+            self._run_git_command(cmd)
+
+            # 拉新的 code 下來
+            cmd = ['git', '-C', str(worktree_path), 'pull', 'origin', f'refs/merge-requests/{mr_info.iid}/head']
             self._run_git_command(cmd)
             
             # 更新元数据
@@ -245,7 +252,11 @@ class WorktreeManager:
     
     @staticmethod
     def _has_local_changes(worktree_path: Path) -> bool:
-        """檢查worktree是否有本地修改"""
+        """
+        檢查 worktree 是否有本地修改
+        
+        忽略 .mr_info.json 這個自動生成的文件
+        """
         try:
             cmd = ['git', '-C', str(worktree_path), 'status', '--porcelain']
             result = subprocess.run(
@@ -254,9 +265,14 @@ class WorktreeManager:
                 text=True,
                 check=True
             )
-            return bool(result.stdout.strip())
+            
+            # 過濾出非 .mr_info.json 的變更
+            changes = [line for line in result.stdout.strip().split('\n') 
+                      if line and not line.endswith('.mr_info.json')]
+            
+            return bool(changes)
         except Exception:
-            return True  # 如果无法檢查，认为有修改
+            return True  # 如果無法檢查，認為有修改
     
     @staticmethod
     def _run_git_command(cmd, cwd=None):
