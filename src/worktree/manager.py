@@ -53,18 +53,32 @@ class WorktreeManager:
             logger.info(f"建立worktree: {worktree_path}")
             logger.debug(f"MR: {mr_info.project_name}#{mr_info.iid}")
             logger.debug(f"分支: origin/{mr_info.source_branch}")
+
+            # 1. 先把該 MR 的特定 Ref 抓下來
+            # refs/merge-requests/{iid}/head 是 GitLab 官方提供的虛擬引用
+            git_repo_path = self._get_git_repo_path(mr_info)
+            fetch_cmd = [
+               'git',
+               'fetch',
+               'origin',
+                f'refs/merge-requests/{mr_info.iid}/head'
+            ]
             
+            logger.info(f"Fetching MR !{mr_info.iid}...")
+            self._run_git_command(fetch_cmd, cwd=git_repo_path)
+
+            # 2. 從抓下來的快取 (FETCH_HEAD) 建立 worktree
             # 使用git worktree add命令
             # 需要確保有一個本地倉庫的複製
-            cmd = [
+            add_cmd = [
                 'git',
                 'worktree',
                 'add',
                 str(worktree_path),
-                f'origin/{mr_info.source_branch}'
+                'FETCH_HEAD'
             ]
             
-            self._run_git_command(cmd)
+            self._run_git_command(add_cmd, cwd=git_repo_path)
             
             # 保存元数据
             self._save_mr_metadata(mr_info, worktree_path)
@@ -170,6 +184,20 @@ class WorktreeManager:
             logger.error(f"刪除worktree失敗: {e}")
             return False
     
+    def _get_git_repo_path(self, mr_info: MRInfo) -> Path:
+        """
+        取得 Git 倉庫路徑
+        
+        reviews_path 用於存放 worktrees，而主倉庫位於 reviews_path 的上層目錄
+        結構如下：
+        - ~/GIT_POOL/                     (主倉庫所在層)
+        - ~/GIT_POOL/project_name/.git    (實際的 git 倉庫)
+        - ~/GIT_POOL/reviews/             (worktrees 根目錄)
+        - ~/GIT_POOL/reviews/project_name/1/ (worktree)
+        - ~/GIT_POOL/reviews/project_name/2/ (worktree)
+        """
+        return Path(self.config.reviews_path).expanduser().parent / mr_info.project_name
+
     def _get_worktree_path(self, mr_info: MRInfo) -> Path:
         """取得worktree路徑"""
         return Path(self.config.reviews_path).expanduser() / mr_info.project_name / str(mr_info.iid)
