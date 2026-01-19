@@ -182,7 +182,19 @@ class GitLabClient:
     def _convert_mr_to_info(mr, project) -> MRInfo:
         """
         將 GitLab MR 對象轉換為 MRInfo
+        
+        處理不同 GitLab 版本的屬性差異：
+        - 新版本使用 draft 屬性
+        - 舊版本使用 work_in_progress 屬性
         """
+        # 處理 draft 屬性的兼容性
+        draft = getattr(mr, 'draft', None)
+        work_in_progress = getattr(mr, 'work_in_progress', False) or False
+        
+        # 如果 draft 不存在，則使用 work_in_progress
+        if draft is None:
+            draft = work_in_progress
+        
         return MRInfo(
             id=mr.id,
             project_id=project.id,
@@ -197,6 +209,6 @@ class GitLabClient:
             source_branch=mr.source_branch,
             target_branch=mr.target_branch,
             web_url=mr.web_url,
-            draft=mr.draft or False,
-            work_in_progress=mr.work_in_progress or False,
+            draft=draft,
+            work_in_progress=work_in_progress,
         )
