@@ -55,7 +55,7 @@ class WorktreeManager:
             logger.debug(f"分支: origin/{mr_info.source_branch}")
             
             # 使用git worktree add命令
-            # 需要確保有一个本地仓库的克隆
+            # 需要確保有一個本地倉庫的複製
             cmd = [
                 'git',
                 'worktree',
@@ -246,7 +246,7 @@ class WorktreeManager:
                 raise GitError(f"Git命令失敗: {result.stderr}")
             
             if result.stdout:
-                logger.debug(f"Git输出: {result.stdout}")
+                logger.debug(f"Git 輸出: {result.stdout}")
         
         except Exception as e:
             raise GitError(f"執行git命令失敗: {e}")

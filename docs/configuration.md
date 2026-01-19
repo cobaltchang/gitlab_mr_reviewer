@@ -1,10 +1,10 @@
-# 設定说明
+# 設定說明
 
 ## 環境變數
 
 所有設定選項可以透過 `.env` 檔案進行設定。參考 `.env.example` 取得完整的設定模板。
 
-### GitLab连接設定
+### GitLab 連接設定
 
 #### GITLAB_URL
 GitLab 執行個體的 URL。
@@ -14,36 +14,36 @@ GITLAB_URL=https://ncs-gitlab/
 ```
 
 #### GITLAB_TOKEN
-GitLab 個人存取令牌。用於 API 认证。
+GitLab 個人存取令牌。用於 API 驗證。
 
 ```bash
 GITLAB_TOKEN=glpat-xxxxxxxxxxxxxxxxxxxx
 ```
 
-需要的權限范围：
+需要的權限範圍：
 - `api` - 完整 API 訪問
-- `read_repository` - 读取仓库內容
+- `read_repository` - 讀取倉庫內容
 
 生成方式：Settings → Personal Access Tokens
 
 #### GITLAB_VERIFY_SSL
-是否驗證 SSL 证书。預設 `true`。
+是否驗證 SSL 憑證。預設 `true`。
 
 ```bash
-GITLAB_VERIFY_SSL=true  # 生产環境应该为true
-GITLAB_VERIFY_SSL=false # 開發環境或自签证书可设为false
+GITLAB_VERIFY_SSL=true  # 生產環境應該為 true
+GITLAB_VERIFY_SSL=false # 開發環境或自簽憑證可設為 false
 ```
 
 ### 本地路徑設定
 
 #### REVIEWS_PATH
-Worktree 的根目錄。所有 MR 對應的 worktree 将在此目錄下建立。
+Worktree 的根目錄。所有 MR 對應的 worktree 將在此目錄下建立。
 
 ```bash
 REVIEWS_PATH=~/GIT_POOL/reviews
 ```
 
-worktree 目錄结构：
+Worktree 目錄結構：
 ```
 ~/GIT_POOL/reviews/
 ├── group/project1/
@@ -55,14 +55,14 @@ worktree 目錄结构：
 ```
 
 #### STATE_DIR
-狀態檔案和資料库的存儲目錄。
+狀態檔案和資料庫的存儲目錄。
 
 ```bash
 STATE_DIR=~/.gitlab_mr_reviewer
 ```
 
 #### DB_PATH
-資料库檔案路徑。仅在 `STORAGE_TYPE=sqlite` 时使用。
+資料庫檔案路徑。僅在 `STORAGE_TYPE=sqlite` 時使用。
 
 ```bash
 DB_PATH=~/.gitlab_mr_reviewer/db.sqlite
@@ -87,50 +87,50 @@ PROJECTS=123,group/project1
 ### 掃描設定
 
 #### SCAN_INTERVAL
-掃描间隔，单位为秒。用於定时掃描。
+掃描間隔，單位為秒。用於定時掃描。
 
 ```bash
-SCAN_INTERVAL=3600  # 每小时掃描一次
-SCAN_INTERVAL=1800  # 每30分钟掃描一次
+SCAN_INTERVAL=3600  # 每小時掃描一次
+SCAN_INTERVAL=1800  # 每 30 分鐘掃描一次
 ```
 
 #### EXCLUDE_WIP
-是否排除 WIP（Work In Progress）标记的 MR。
+是否排除 WIP（Work In Progress）標記的 MR。
 
 ```bash
-EXCLUDE_WIP=true   # 排除WIP MR
-EXCLUDE_WIP=false  # 包含WIP MR
+EXCLUDE_WIP=true   # 排除 WIP MR
+EXCLUDE_WIP=false  # 包含 WIP MR
 ```
 
 #### EXCLUDE_DRAFT
 是否排除草稿（Draft）MR。
 
 ```bash
-EXCLUDE_DRAFT=true   # 排除草稿MR
-EXCLUDE_DRAFT=false  # 包含草稿MR
+EXCLUDE_DRAFT=true   # 排除草稿 MR
+EXCLUDE_DRAFT=false  # 包含草稿 MR
 ```
 
 #### MR_STATES
 MR 狀態篩選。支援的值：`opened`, `merged`, `closed`, `locked`。
 
 ```bash
-MR_STATES=opened                    # 只掃描打开的MR
-MR_STATES=opened,merged             # 掃描打开和已合併的MR
-MR_STATES=opened,merged,closed      # 掃描所有狀態的MR
+MR_STATES=opened                    # 只掃描打開的 MR
+MR_STATES=opened,merged             # 掃描打開和已合併的 MR
+MR_STATES=opened,merged,closed      # 掃描所有狀態的 MR
 ```
 
 ### 日誌設定
 
 #### LOG_LEVEL
-日誌級別。可选值：`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`。
+日誌級別。可選值：`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`。
 
 ```bash
-LOG_LEVEL=INFO      # 仅显示重要訊息
-LOG_LEVEL=DEBUG     # 显示所有除錯訊息
+LOG_LEVEL=INFO      # 僅顯示重要訊息
+LOG_LEVEL=DEBUG     # 顯示所有除錯訊息
 ```
 
 #### LOG_FILE
-日誌檔案路徑。如果不設定，仅输出到控制台。
+日誌檔案路徑。如果不設定，僅輸出到控制台。
 
 ```bash
 LOG_FILE=~/.gitlab_mr_reviewer/scanner.log
@@ -144,7 +144,7 @@ LOG_MAX_SIZE=10485760  # 10MB
 ```
 
 #### LOG_BACKUP_COUNT
-保留的日誌檔案备份个数。
+保留的日誌檔案備份個數。
 
 ```bash
 LOG_BACKUP_COUNT=5
@@ -153,11 +153,11 @@ LOG_BACKUP_COUNT=5
 ### 存儲設定
 
 #### STORAGE_TYPE
-存儲后端类型。可选：`json` 或 `sqlite`。
+存儲後端類型。可選：`json` 或 `sqlite`。
 
 ```bash
-STORAGE_TYPE=sqlite  # 推荐使用SQLite
-STORAGE_TYPE=json    # 简单專案可使用JSON
+STORAGE_TYPE=sqlite  # 推薦使用 SQLite
+STORAGE_TYPE=json    # 簡單專案可使用 JSON
 ```
 
 **對比**：
@@ -165,10 +165,10 @@ STORAGE_TYPE=json    # 简单專案可使用JSON
 | 特性 | SQLite | JSON |
 |------|--------|------|
 | 性能 | 好 | 一般 |
-| 可扩展性 | 好 | 一般 |
-| 查詢能力 | 强 | 弱 |
-| 体积 | 小 | 较大 |
-| 并发 | 支援 | 不支援 |
+| 可擴展性 | 好 | 一般 |
+| 查詢能力 | 強 | 弱 |
+| 體積 | 小 | 較大 |
+| 並發 | 支援 | 不支援 |
 
 ### 進階設定
 
@@ -176,7 +176,7 @@ STORAGE_TYPE=json    # 简单專案可使用JSON
 啟用除錯模式。會輸出詳細的 API 請求和回應訊息。
 
 ```bash
-DEBUG=true   # 启用除錯模式
+DEBUG=true   # 啟用除錯模式
 DEBUG=false  # 禁用除錯模式
 ```
 
@@ -185,24 +185,24 @@ DEBUG=false  # 禁用除錯模式
 
 ```bash
 AUTO_CLEAN_MERGED=true   # 自動清理
-AUTO_CLEAN_MERGED=false  # 保留已合併MR的worktree
+AUTO_CLEAN_MERGED=false  # 保留已合併 MR 的 worktree
 ```
 
 #### CONNECTION_TIMEOUT
-API 请求连接超时時間，单位为秒。
+API 請求連接超時時間，單位為秒。
 
 ```bash
-CONNECTION_TIMEOUT=30   # 30秒超时
+CONNECTION_TIMEOUT=30   # 30 秒超時
 ```
 
 #### API_RETRY_COUNT
 API 請求重試次數。失敗時自動重試指定次數。
 
 ```bash
-API_RETRY_COUNT=3   # 失敗後重試3次
+API_RETRY_COUNT=3   # 失敗後重試 3 次
 ```
 
-## 設定檔案方式（可选）
+## 設定檔案方式（可選）
 
 除了環境變數，也可以使用 `config.yaml` 設定檔案：
 
@@ -249,8 +249,8 @@ python -m src.main scan --config config.yaml
 
 ## 設定驗證
 
-在執行之前，可以驗證設定是否正确：
+在執行之前，可以驗證設定是否正確：
 
 ```bash
-python -c "from src.config import Config; Config.from_env(); print('✓ 設定正确')"
+python -c "from src.config import Config; Config.from_env(); print('✓ 設定正確')"
 ```

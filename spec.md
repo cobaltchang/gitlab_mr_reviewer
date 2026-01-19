@@ -8,17 +8,17 @@ GitLab MR Reviewer是一個自動化的Merge Request掃描和本地審查工具�
 
 ### 2.1 MR 掃描功能
 
-- 支持多個專案的掃描
-- 支持排除WIP和草稿MR
+- 支援多個專案的掃描
+- 支援排除 WIP 和草稿 MR
 - 增量掃描和狀態追蹤
 - 自定義篩選條件
 
 ### 2.2 Worktree 管理功能
 
-- 自動建立和刪除worktree
-- 增量更新支持
-- .mr_info.json元資料儲存
-- 支持試執行模式
+- 自動建立和刪除 worktree
+- 增量更新支援
+- .mr_info.json 元資料儲存
+- 支援試執行模式
 
 ### 2.3 狀態管理
 
@@ -79,7 +79,7 @@ GitPython>=3.1.0         # Git操作
 click>=8.1.0             # CLI框架
 python-dotenv>=0.19.0    # 環境變數
 pytest>=7.0.0            # 測試框架
-pytest-mock>=3.10.0      # Mock支持
+pytest-mock>=3.10.0      # Mock 支援
 ```
 
 ## 4. 資料流程
@@ -272,7 +272,7 @@ python -m src.main clean-worktree --iid <MR_IID> [--project <PROJECT>]
 
 - 快取GitLab回應
 - 分批建立worktree
-- 非同步操作支持
+- 非同步操作支援
 
 ### 13.2 監控
 
@@ -284,7 +284,7 @@ python -m src.main clean-worktree --iid <MR_IID> [--project <PROJECT>]
 ## 14. 未來改進
 
 - [ ] Web UI界面
-- [ ] 支持其他Git服務
+- [ ] 支援其他 Git 服務
 - [ ] 非同步操作
 - [ ] 性能優化
 - [ ] 擴展插件系統
