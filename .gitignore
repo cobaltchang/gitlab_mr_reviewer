@@ -48,6 +48,9 @@ htmlcov/
 .env.local
 .env.*.local
 
+# Configuration files
+gitlab_projects.txt
+
 # Project runtime files
 ~/GIT_POOL/reviews/
 logs/
