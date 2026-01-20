@@ -126,14 +126,20 @@ class TestWorktreeManagerCreate:
         metadata_file = result / ".mr_info.json"
         assert metadata_file.exists()
         
-        # 檢查 git 命令呼叫
-        mock_git.assert_called_once()
-        call_args = mock_git.call_args[0][0]
-        assert call_args[0] == "git"
-        assert call_args[1] == "worktree"
-        assert call_args[2] == "add"
-        assert call_args[3] == str(expected_path)
-        assert call_args[4] == "origin/feature/test"
+        # 檢查 git 命令呼叫（應該有 2 次：fetch + worktree add）
+        assert mock_git.call_count == 2
+        
+        # 檢查第一次呼叫（fetch）
+        first_call_args = mock_git.call_args_list[0][0][0]
+        assert first_call_args[0] == "git"
+        assert first_call_args[1] == "fetch"
+        
+        # 檢查第二次呼叫（worktree add）
+        second_call_args = mock_git.call_args_list[1][0][0]
+        assert second_call_args[0] == "git"
+        assert second_call_args[1] == "worktree"
+        assert second_call_args[2] == "add"
+        assert second_call_args[3] == str(expected_path)
     
     @patch('src.worktree.manager.WorktreeManager._run_git_command')
     def test_create_worktree_already_exists(self, mock_git, worktree_manager, mr_info, temp_dir):
