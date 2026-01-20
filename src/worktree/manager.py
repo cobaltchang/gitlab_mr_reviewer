@@ -45,6 +45,7 @@ class WorktreeManager:
             # 檢查worktree是否已存在
             if worktree_path.exists():
                 logger.warning(f"Worktree已存在: {worktree_path}")
+                self.update_worktree(mr_info)
                 return worktree_path
             
             # 建立父目錄
@@ -53,18 +54,32 @@ class WorktreeManager:
             logger.info(f"建立worktree: {worktree_path}")
             logger.debug(f"MR: {mr_info.project_name}#{mr_info.iid}")
             logger.debug(f"分支: origin/{mr_info.source_branch}")
+
+            # 1. 先把該 MR 的特定 Ref 抓下來
+            # refs/merge-requests/{iid}/head 是 GitLab 官方提供的虛擬引用
+            git_repo_path = self._get_git_repo_path(mr_info)
+            fetch_cmd = [
+               'git',
+               'fetch',
+               'origin',
+                f'refs/merge-requests/{mr_info.iid}/head'
+            ]
             
+            logger.info(f"Fetching MR !{mr_info.iid}...")
+            self._run_git_command(fetch_cmd, cwd=git_repo_path)
+
+            # 2. 從抓下來的快取 (FETCH_HEAD) 建立 worktree
             # 使用git worktree add命令
             # 需要確保有一個本地倉庫的複製
-            cmd = [
+            add_cmd = [
                 'git',
                 'worktree',
                 'add',
                 str(worktree_path),
-                f'origin/{mr_info.source_branch}'
+                'FETCH_HEAD'
             ]
             
-            self._run_git_command(cmd)
+            self._run_git_command(add_cmd, cwd=git_repo_path)
             
             # 保存元数据
             self._save_mr_metadata(mr_info, worktree_path)
@@ -113,8 +128,14 @@ class WorktreeManager:
             # 改為強制更新
             
             # 執行git pull更新
-            logger.debug(f"執行git pull更新分支 {mr_info.source_branch}")
-            cmd = ['git', '-C', str(worktree_path), 'pull', 'origin', mr_info.source_branch]
+            logger.debug(f"執行git pull更新MR !{mr_info.iid}")
+
+            # 可能有 force update，先回到原本的點
+            cmd = ['git', '-C', str(worktree_path), 'reset', '--hard', mr_info.target_branch]
+            self._run_git_command(cmd)
+
+            # 拉新的 code 下來
+            cmd = ['git', '-C', str(worktree_path), 'pull', 'origin', f'refs/merge-requests/{mr_info.iid}/head']
             self._run_git_command(cmd)
             
             # 更新元数据
@@ -170,6 +191,20 @@ class WorktreeManager:
             logger.error(f"刪除worktree失敗: {e}")
             return False
     
+    def _get_git_repo_path(self, mr_info: MRInfo) -> Path:
+        """
+        取得 Git 倉庫路徑
+        
+        reviews_path 用於存放 worktrees，而主倉庫位於 reviews_path 的上層目錄
+        結構如下：
+        - ~/GIT_POOL/                     (主倉庫所在層)
+        - ~/GIT_POOL/project_name/.git    (實際的 git 倉庫)
+        - ~/GIT_POOL/reviews/             (worktrees 根目錄)
+        - ~/GIT_POOL/reviews/project_name/1/ (worktree)
+        - ~/GIT_POOL/reviews/project_name/2/ (worktree)
+        """
+        return Path(self.config.reviews_path).expanduser().parent / mr_info.project_name
+
     def _get_worktree_path(self, mr_info: MRInfo) -> Path:
         """取得worktree路徑"""
         return Path(self.config.reviews_path).expanduser() / mr_info.project_name / str(mr_info.iid)
@@ -217,7 +252,11 @@ class WorktreeManager:
     
     @staticmethod
     def _has_local_changes(worktree_path: Path) -> bool:
-        """檢查worktree是否有本地修改"""
+        """
+        檢查 worktree 是否有本地修改
+        
+        忽略 .mr_info.json 這個自動生成的文件
+        """
         try:
             cmd = ['git', '-C', str(worktree_path), 'status', '--porcelain']
             result = subprocess.run(
@@ -226,9 +265,14 @@ class WorktreeManager:
                 text=True,
                 check=True
             )
-            return bool(result.stdout.strip())
+            
+            # 過濾出非 .mr_info.json 的變更
+            changes = [line for line in result.stdout.strip().split('\n') 
+                      if line and not line.endswith('.mr_info.json')]
+            
+            return bool(changes)
         except Exception:
-            return True  # 如果无法檢查，认为有修改
+            return True  # 如果無法檢查，認為有修改
     
     @staticmethod
     def _run_git_command(cmd, cwd=None):
