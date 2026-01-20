@@ -35,7 +35,7 @@ def setup_logging(log_level: str = "INFO", log_dir: str = "logs") -> logging.Log
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     
-    # 控制台輸出
+    # 控制檯輸出
     console_handler = logging.StreamHandler()
     console_handler.setLevel(getattr(logging, log_level.upper()))
     console_handler.setFormatter(formatter)

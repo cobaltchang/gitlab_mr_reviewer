@@ -53,7 +53,7 @@ python -m src.main scan --dry-run
 
 本項目遵循 TDD (Test-Driven Development) 方法論。每個 commit 都應包含對應的測試，並確保所有測試通過。
 
-詳見 [CONTRIBUTING.md](CONTRIBUTING.md) 了解開發流程和規範。
+詳見 [CONTRIBUTING.md](CONTRIBUTING.md) 瞭解開發流程和規範。
 
 ## 文檔
 

@@ -39,7 +39,7 @@ pip install -r requirements.txt
 #### 4.1 複製環境變數範本
 
 ```bash
-# 複製示例設定檔案
+# 複製範例設定檔案
 cp .env.example .env
 
 # 編輯 .env 檔案，設定以下必要參數：
@@ -72,7 +72,7 @@ group/project2
 group/subgroup/project3
 ```
 
-### 5. 生成 GitLab 個人存取令牌
+### 5. 產生 GitLab 個人存取令牌
 
 1. 訪問 GitLab 執行個體: https://ncs-gitlab/
 2. 登入到你的帳戶
@@ -81,7 +81,7 @@ group/subgroup/project3
 5. 建立新令牌，需要的權限：
    - `api` - 完整 API 訪問
    - `read_repository` - 讀取倉庫內容
-6. 複製生成的令牌到 `.env` 檔案中的 `GITLAB_TOKEN`
+6. 複製產生的令牌到 `.env` 檔案中的 `GITLAB_TOKEN`
 
 ### 6. 驗證安裝
 

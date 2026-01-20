@@ -24,7 +24,7 @@ GITLAB_TOKEN=glpat-xxxxxxxxxxxxxxxxxxxx
 - `api` - 完整 API 訪問
 - `read_repository` - 讀取倉庫內容
 
-生成方式：Settings → Personal Access Tokens
+產生方式：Settings → Personal Access Tokens
 
 #### GITLAB_VERIFY_SSL
 是否驗證 SSL 憑證。預設 `true`。
@@ -71,7 +71,7 @@ DB_PATH=~/.gitlab_mr_reviewer/db.sqlite
 ### 監控專案設定
 
 #### PROJECTS
-要監控的專案列表，逗号分隔。支援專案 ID 或專案路徑。
+要監控的專案列表，逗號分隔。支援專案 ID 或專案路徑。
 
 ```bash
 # 使用專案ID
@@ -130,7 +130,7 @@ LOG_LEVEL=DEBUG     # 顯示所有除錯訊息
 ```
 
 #### LOG_FILE
-日誌檔案路徑。如果不設定，僅輸出到控制台。
+日誌檔案路徑。如果不設定，僅輸出到控制檯。
 
 ```bash
 LOG_FILE=~/.gitlab_mr_reviewer/scanner.log

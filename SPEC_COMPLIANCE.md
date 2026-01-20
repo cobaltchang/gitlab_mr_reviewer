@@ -161,7 +161,7 @@
 
 ✅ **完全遵循 Conventional Commit 規範**
 
-最近的 commit 示例：
+最近的 commit 範例：
 ```
 refactor(i18n): 統一繁體中文本地化
 feat(cli): 實現命令行介面主應用程式

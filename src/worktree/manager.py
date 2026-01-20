@@ -31,7 +31,7 @@ class WorktreeManager:
     
     def create_worktree(self, mr_info: MRInfo) -> Path:
         """
-        为MR建立worktree
+        爲MR建立worktree
         
         Args:
             mr_info: MR訊息
@@ -81,7 +81,7 @@ class WorktreeManager:
             
             self._run_git_command(add_cmd, cwd=git_repo_path)
             
-            # 保存元数据
+            # 保存元資料
             self._save_mr_metadata(mr_info, worktree_path)
             
             # 更新狀態
@@ -98,7 +98,7 @@ class WorktreeManager:
     
     def update_worktree(self, mr_info: MRInfo) -> bool:
         """
-        更新worktree内容
+        更新worktree內容
         
         Args:
             mr_info: MR訊息
@@ -121,7 +121,7 @@ class WorktreeManager:
             
             # 檢查是否有本地修改
             if self._has_local_changes(worktree_path):
-                logger.warning(f"Worktree有本地修改，跳过更新: {worktree_path}")
+                logger.warning(f"Worktree有本地修改，跳過更新: {worktree_path}")
                 return False
             
             # 注意：無法比較 head_commit_sha，因為 MRInfo 中沒有此欄位
@@ -138,7 +138,7 @@ class WorktreeManager:
             cmd = ['git', '-C', str(worktree_path), 'pull', 'origin', f'refs/merge-requests/{mr_info.iid}/head']
             self._run_git_command(cmd)
             
-            # 更新元数据
+            # 更新元資料
             self._save_mr_metadata(mr_info, worktree_path)
             
             # 更新狀態
@@ -210,7 +210,7 @@ class WorktreeManager:
         return Path(self.config.reviews_path).expanduser() / mr_info.project_name / str(mr_info.iid)
     
     def _save_mr_metadata(self, mr_info: MRInfo, worktree_path: Path):
-        """保存MR元数据"""
+        """保存 MR 元資料"""
         import json
         from datetime import datetime
         
@@ -255,7 +255,7 @@ class WorktreeManager:
         """
         檢查 worktree 是否有本地修改
         
-        忽略 .mr_info.json 這個自動生成的文件
+        忽略 .mr_info.json 這個自動產生的文件
         """
         try:
             cmd = ['git', '-C', str(worktree_path), 'status', '--porcelain']
