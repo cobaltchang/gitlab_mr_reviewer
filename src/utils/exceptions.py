@@ -13,9 +13,13 @@ class GitLabError(Exception):
     pass
 
 
-class WorktreeError(Exception):
-    """Worktree 操作錯誤"""
+class CloneError(Exception):
+    """Clone 操作錯誤"""
     pass
+
+
+# 保留別名以維持向後相容
+WorktreeError = CloneError
 
 
 class StateError(Exception):
