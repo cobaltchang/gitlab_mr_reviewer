@@ -27,7 +27,7 @@ def temp_dir():
 def config(temp_dir):
     """建立測試 Config"""
     return Config(
-        gitlab_url="https://gitlab.com",
+        gitlab_url="https://gitlab.example.com",
         gitlab_token="test_token",
         projects=["group/project"],
         reviews_path=str(temp_dir / "reviews"),
@@ -63,7 +63,7 @@ def mr_info():
         author="user@example.com",
         source_branch="feature/test",
         target_branch="main",
-        web_url="https://gitlab.com/group/project/-/merge_requests/10",
+        web_url="https://gitlab.example.com/group/project/-/merge_requests/10",
         created_at="2024-01-01T00:00:00Z",
         updated_at="2024-01-02T00:00:00Z",
         state="opened",

@@ -74,7 +74,7 @@ group/subgroup/project3
 
 ### 5. 產生 GitLab 個人存取令牌
 
-1. 訪問 GitLab 執行個體: https://ncs-gitlab/
+1. 訪問 GitLab 執行個體: https://gitlab.example.com/
 2. 登入到你的帳戶
 3. 點擊右上角頭像 → Settings
 4. 左邊欄點擊 Access Tokens

@@ -10,7 +10,7 @@
 GitLab 執行個體的 URL。
 
 ```bash
-GITLAB_URL=https://ncs-gitlab/
+GITLAB_URL=https://gitlab.example.com/
 ```
 
 #### GITLAB_TOKEN
@@ -222,7 +222,7 @@ API_RETRY_COUNT=3   # 失敗後重試 3 次
 
 ```yaml
 gitlab:
-  url: https://ncs-gitlab/
+  url: https://gitlab.example.com/
   token: glpat-xxxxxxxxxxxxxxxxxxxx
   verify_ssl: true
 
