@@ -400,6 +400,21 @@ pytest tests/test_xxx.py -v --pdb
 pip install -r requirements.txt
 ```
 
+## Security & Developer Environment
+
+- **不要在倉庫提交密鑰或 token。** 使用環境變數和 CI secrets 管理機密資料。若不慎洩露，請依照 `docs/incident_response.md` 通知維護者並旋轉憑證。
+- `GITLAB_TOKEN` 應使用最小權限（scoped token），不應放入程式碼或測試資料中。
+- 開發者請在隔離的虛擬環境中安裝開發依賴：
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+pip install -r dev-requirements.txt
+```
+
+- 若需在本機執行安全掃描或產生 SBOM，請在 `dev-requirements.txt` 中安裝相依工具，避免將開發工具列於 `requirements.txt` 以防 CI 或使用者誤報。
+
+
 ### 環境變數未設定
 
 確保 `.env` 檔案存在且包含所有必要的變數：
