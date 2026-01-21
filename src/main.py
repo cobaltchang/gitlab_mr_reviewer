@@ -97,7 +97,7 @@ def scan(exclude_wip: bool, exclude_draft: bool, dry_run: bool):
         logger.info(f"掃描完成，發現 {total_mrs} 個 MR")
         
         if dry_run:
-            click.echo(f"✓ 乾執行模式：將處理 {total_mrs} 個 MR")
+            click.echo(f"✓ 試執行模式：將處理 {total_mrs} 個 MR")
             for result in scan_results:
                 if result.error:
                     click.echo(f"  ✗ {result.project}: {result.error}")

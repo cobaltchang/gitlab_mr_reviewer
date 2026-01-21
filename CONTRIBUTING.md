@@ -104,7 +104,7 @@ cp .env.example .env
 
 ### 實現新功能
 
-假設要添加新的「生成審查報告」功能：
+假設要添加新的「產生審查報告」功能：
 
 #### Step 1: 編寫測試
 
@@ -115,7 +115,7 @@ from src.report.generator import ReportGenerator
 
 class TestReportGenerator:
     def test_generate_report_success(self):
-        """測試成功生成報告"""
+        """測試成功產生報告"""
         generator = ReportGenerator()
         report = generator.generate()
         
@@ -143,7 +143,7 @@ class Report:
 
 class ReportGenerator:
     def generate(self) -> Report:
-        """生成審查報告"""
+        """產生審查報告"""
         return Report(
             title="MR 審查報告",
             content="報告內容"
@@ -165,7 +165,7 @@ pytest tests/test_report.py -v
 
 ```bash
 git add src/report/ tests/test_report.py
-git commit -m "feat(report): 實現 MR 審查報告生成功能"
+git commit -m "feat(report): 實現 MR 審查報告產生功能"
 ```
 
 ## 代碼風格

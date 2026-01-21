@@ -159,3 +159,44 @@ class TestMRScanner:
         assert result.project == "test/project"
         assert len(result.merge_requests) == 0
         assert result.error is not None
+
+
+    def test_scan_handles_client_exception(self):
+        """當 client 發生例外時，scan 應回傳帶有 error 的 ScanResult"""
+        mock_client = Mock()
+        mock_state_manager = Mock()
+
+        # 設定 client 在取得 MR 時拋出例外
+        mock_client.get_merge_requests.side_effect = Exception("API error")
+
+        scanner = MRScanner(mock_client, mock_state_manager)
+        results = scanner.scan(["group/project"], exclude_wip=True, exclude_draft=True)
+
+        assert len(results) == 1
+        assert results[0].error is not None
+        assert "API error" in results[0].error
+
+
+def test_scan_success_calls_filter_and_returns_results():
+    from src.scanner.mr_scanner import MRScanner
+    from src.gitlab_.models import MRInfo
+
+    mock_client = Mock()
+    mock_state_manager = Mock()
+
+    mr = MRInfo(
+        id=1, project_id=1, project_name="test/project", iid=1,
+        title="Test MR", description="", state="opened",
+        author="test", created_at="", updated_at="",
+        source_branch="feature", target_branch="main",
+        web_url="", draft=False, work_in_progress=False
+    )
+
+    mock_client.get_merge_requests.return_value = [mr]
+
+    scanner = MRScanner(mock_client, mock_state_manager)
+    results = scanner.scan(["group/project"], exclude_wip=True, exclude_draft=True)
+
+    assert len(results) == 1
+    assert results[0].project == "group/project"
+    assert len(results[0].merge_requests) == 1

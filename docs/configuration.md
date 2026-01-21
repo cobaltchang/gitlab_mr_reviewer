@@ -24,14 +24,14 @@ GITLAB_TOKEN=glpat-xxxxxxxxxxxxxxxxxxxx
 - `api` - 完整 API 訪問
 - `read_repository` - 讀取倉庫內容
 
-生成方式：Settings → Personal Access Tokens
+產生方式：Settings → Personal Access Tokens
 
-#### GITLAB_VERIFY_SSL
+#### GITLAB_SSL_VERIFY
 是否驗證 SSL 憑證。預設 `true`。
 
 ```bash
-GITLAB_VERIFY_SSL=true  # 生產環境應該為 true
-GITLAB_VERIFY_SSL=false # 開發環境或自簽憑證可設為 false
+GITLAB_SSL_VERIFY=true  # 生產環境應該為 true
+GITLAB_SSL_VERIFY=false # 開發環境或自簽憑證可設為 false
 ```
 
 ### 本地路徑設定
@@ -70,18 +70,32 @@ DB_PATH=~/.gitlab_mr_reviewer/db.sqlite
 
 ### 監控專案設定
 
-#### PROJECTS
-要監控的專案列表，逗号分隔。支援專案 ID 或專案路徑。
+#### GITLAB_PROJECTS / GITLAB_PROJECTS_FILE
+要監控的專案列表，可透過環境變數 `GITLAB_PROJECTS`（逗號分隔）或 `GITLAB_PROJECTS_FILE`（每行一個專案，推薦方式）來設定。支援專案 ID 或專案路徑。
+
+使用環境變數範例：
 
 ```bash
 # 使用專案ID
-PROJECTS=123,456,789
+GITLAB_PROJECTS=123,456,789
 
 # 使用專案路徑
-PROJECTS=group/project1,group/project2,group/subgroup/project3
+GITLAB_PROJECTS=group/project1,group/project2,group/subgroup/project3
 
 # 混合使用
-PROJECTS=123,group/project1
+GITLAB_PROJECTS=123,group/project1
+```
+
+使用檔案範例（`GITLAB_PROJECTS_FILE`）：
+
+```bash
+# file: gitlab_projects.txt
+group/project1
+group/project2
+group/subgroup/project3
+
+# 在 .env 中設定
+GITLAB_PROJECTS_FILE=./gitlab_projects.txt
 ```
 
 ### 掃描設定
@@ -130,7 +144,7 @@ LOG_LEVEL=DEBUG     # 顯示所有除錯訊息
 ```
 
 #### LOG_FILE
-日誌檔案路徑。如果不設定，僅輸出到控制台。
+日誌檔案路徑。如果不設定，僅輸出到控制檯。
 
 ```bash
 LOG_FILE=~/.gitlab_mr_reviewer/scanner.log
