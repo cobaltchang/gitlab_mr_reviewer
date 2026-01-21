@@ -1,12 +1,12 @@
 # GitLab MR Reviewer
 
-自動化 GitLab MR 掃描與本地審查工具。定期掃描 https://gitlab.example.com/ 上的新 Merge Requests，自動在本地建立 git worktrees，支援增量更新，便於程式碼審查。
+自動化 GitLab MR 掃描與本地審查工具。定期掃描 GitLab 上的新 Merge Requests，自動在本地建立獨立的 git clone（single-branch 模式），便於程式碼審查。
 
 ## 功能特性
 
 - 🔍 **MR 掃描**：自動掃描 GitLab 上符合條件的 Merge Requests
-- 📂 **Worktree 管理**：自動建立和管理本地 git worktree 用於審查
-- 🔄 **增量更新**：支援增量掃描和狀態追蹤
+- 📂 **MR Clone 管理**：使用 `git clone --single-branch` 為每個 MR 建立獨立副本
+- 🔄 **自動同步**：若目錄已存在則刪除重建，確保同步最新狀態
 - 💾 **狀態持久化**：SQLite 和 JSON 雙存儲支援
 - 📝 **完整日誌**：記錄所有操作和錯誤訊息
 - 🛠️ **CLI 工具**：簡單易用的命令行界面
@@ -36,14 +36,14 @@ cp .env.example .env
 ### 使用
 
 ```bash
-# 掃描 MR 並建立 worktree
+# 掃描 MR 並建立 clone
 python -m src.main scan
 
-# 列出所有已建立的 worktree
-python -m src.main list-worktrees
+# 列出所有已建立的 MR clone
+python -m src.main list-clones
 
-# 清理指定的 worktree
-python -m src.main clean-worktree --iid <MR_IID>
+# 清理指定的 MR clone
+python -m src.main clean-clone --iid <MR_IID> --project <PROJECT>
 
 # 試執行模式
 python -m src.main scan --dry-run

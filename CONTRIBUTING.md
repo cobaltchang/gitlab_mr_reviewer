@@ -39,7 +39,7 @@ src/
 ├── gitlab_/                 # GitLab API 集成
 ├── scanner/                 # MR 掃描引擎
 ├── state/                   # 狀態持久化
-├── worktree/                # Git Worktree 管理
+├── clone/                   # MR Clone 管理
 └── main.py                  # CLI 主應用
 ```
 
@@ -57,7 +57,7 @@ src/
 from src.utils.exceptions import (
     ConfigError,      # 設定錯誤
     GitLabError,      # GitLab API 錯誤
-    WorktreeError,    # Worktree 操作錯誤
+    CloneError,       # Clone 操作錯誤
     StateError,       # 狀態管理錯誤
     GitError          # Git 操作錯誤
 )
@@ -182,18 +182,18 @@ git commit -m "feat(report): 實現 MR 審查報告產生功能"
 所有公開類別和函數必須有詳細的文檔字符串：
 
 ```python
-def create_worktree(self, mr_info: MRInfo) -> Path:
+def create_clone(self, mr_info: MRInfo) -> Path:
     """
-    為 MR 建立 worktree
+    為 MR 建立 clone
     
     Args:
         mr_info: MR 訊息
         
     Returns:
-        Worktree 路徑
+        Clone 路徑
         
     Raises:
-        WorktreeError: 建立失敗
+        CloneError: 建立失敗
     """
 ```
 
@@ -238,8 +238,8 @@ pytest tests/ --cov=src --cov-report=html
 
 1. **命名清晰**: `test_<function>_<scenario>`
    ```python
-   def test_create_worktree_success(self):
-   def test_create_worktree_already_exists(self):
+   def test_create_clone_success(self):
+   def test_create_clone_already_exists(self):
    ```
 
 2. **使用 Fixtures**: 集中管理測試資源
@@ -298,9 +298,9 @@ pytest tests/ --cov=src --cov-report=html
 **Examples:**
 
 ```
-feat(worktree): 實現 Git Worktree 管理
+feat(clone): 實現 MR Clone 管理
 
-- 支援建立、更新、刪除 worktree
+- 支援建立、更新、刪除 clone
 - 整合 StateManager 追蹤狀態
 - 完整的錯誤處理
 

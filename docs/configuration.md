@@ -37,13 +37,13 @@ GITLAB_SSL_VERIFY=false # 開發環境或自簽憑證可設為 false
 ### 本地路徑設定
 
 #### REVIEWS_PATH
-Worktree 的根目錄。所有 MR 對應的 worktree 將在此目錄下建立。
+MR clone 的根目錄。所有 MR 對應的 clone 將在此目錄下建立。
 
 ```bash
 REVIEWS_PATH=~/GIT_POOL/reviews
 ```
 
-Worktree 目錄結構：
+Clone 目錄結構：
 ```
 ~/GIT_POOL/reviews/
 ├── group/project1/
@@ -65,7 +65,7 @@ STATE_DIR=~/.gitlab_mr_reviewer
 資料庫檔案路徑。僅在 `STORAGE_TYPE=sqlite` 時使用。
 
 ```bash
-DB_PATH=~/.gitlab_mr_reviewer/db.sqlite
+DB_PATH=~/.gitlab_mr_reviewer/mr_state.sqlite
 ```
 
 ### 監控專案設定

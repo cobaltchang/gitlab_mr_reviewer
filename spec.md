@@ -2,7 +2,7 @@
 
 ## 1. 項目概述
 
-GitLab MR Reviewer是一個自動化的Merge Request掃描和本地審查工具。它定期掃描GitLab上的MR，自動在本地建立git worktrees，便於開發者進行增量式的程式碼審查。
+GitLab MR Reviewer是一個自動化的Merge Request掃描和本地審查工具。它定期掃描GitLab上的MR，自動在本地建立獨立的 git clone（single-branch 模式），便於開發者進行程式碼審查。
 
 ## 2. 核心功能
 
@@ -13,12 +13,21 @@ GitLab MR Reviewer是一個自動化的Merge Request掃描和本地審查工具�
 - 增量掃描和狀態追蹤
 - 自定義篩選條件
 
-### 2.2 Worktree 管理功能
+### 2.2 MR Clone 管理功能
 
-- 自動建立和刪除 worktree
-- 增量更新支援
+- 使用 `git clone -b <source_branch> --single-branch` 建立獨立的 MR 副本
+- 每個 MR 對應一個獨立目錄（`reviews/<project>/<iid>/`）
+- 若目錄已存在則刪除後重新 clone（確保同步最新狀態）
 - .mr_info.json 元資料儲存
 - 支援試執行模式
+
+### 2.3 設計決策
+
+採用 single-branch clone 而非 git worktree 的原因：
+- **簡化依賴**：不需要預先存在的主倉庫
+- **避免 force-push 問題**：重新 clone 即可取得最新狀態，無需處理 reset --hard
+- **隔離性更好**：每個 MR 完全獨立，互不影響
+- **網路頻寬不是瓶頸**：內網環境且 repo 通常不大
 
 ### 2.3 狀態管理
 
@@ -97,18 +106,32 @@ pytest-mock>=3.10.0      # Mock 支援
    ↓
 5. 檢查狀態
    ↓
-6. 建立/更新worktree
+6. 建立MR clone (若已存在則刪除重建)
    ↓
 7. 記錄狀態
    ↓
 8. 輸出結果和日誌
 ```
 
-### 4.2 狀態管理
+### 4.2 MR Clone 建立流程
+
+```
+1. 計算目標路徑: reviews/<project_name>/<iid>/
+   ↓
+2. 若目錄已存在 → 刪除整個目錄
+   ↓
+3. 執行: git clone -b <source_branch> --single-branch <repo_url> <path>
+   ↓
+4. 寫入 .mr_info.json 元資料
+   ↓
+5. 更新狀態資料庫
+```
+
+### 4.3 狀態管理
 
 - **MRState**: 追蹤每個MR的狀態
 - **ScanHistory**: 記錄掃描歷史
-- **WorktreeInfo**: 儲存worktree元資料
+- **CloneInfo**: 儲存在 `.mr_info.json` 中
 
 ## 5. 異常處理
 
@@ -116,7 +139,7 @@ pytest-mock>=3.10.0      # Mock 支援
 
 - `ConfigError`: 設定錯誤
 - `GitLabError`: GitLab API錯誤
-- `WorktreeError`: Worktree操作錯誤
+- `CloneError`: Clone 操作錯誤
 - `StateError`: 狀態管理錯誤
 - `GitError`: Git操作錯誤
 
@@ -126,41 +149,41 @@ pytest-mock>=3.10.0      # Mock 支援
 |---------|---------|
 | GitLab連接失敗 | 重試3次，記錄錯誤，中止掃描 |
 | MR資訊取得失敗 | 記錄錯誤，跳過該MR，繼續掃描 |
-| Worktree建立失敗 | 回滾操作，記錄日誌，繼續下一個MR |
-| Git操作失敗 | 記錄錯誤，標記worktree為異常狀態 |
+| Clone建立失敗 | 刪除殘留目錄，記錄日誌，繼續下一個MR |
+| Git操作失敗 | 記錄錯誤，刪除目錄後重試一次 |
 
 ## 6. CLI 命令
 
 ### 6.1 scan 命令
 
-掃描GitLab上的新MR並建立本地worktree。
+掃描GitLab上的新MR並建立本地 clone。
 
 ```bash
 python -m src.main scan [--dry-run]
 ```
 
 **選項:**
-- `--dry-run`: 試執行模式，不實際建立worktree
+- `--dry-run`: 試執行模式，不實際建立 clone
 
-### 6.2 list-worktrees 命令
+### 6.2 list-clones 命令
 
-列出所有已建立的worktree及其狀態。
+列出所有已建立的 MR clone 及其狀態。
 
 ```bash
-python -m src.main list-worktrees
+python -m src.main list-clones
 ```
 
-### 6.3 clean-worktree 命令
+### 6.3 clean-clone 命令
 
-清理指定的worktree。
+清理指定的 MR clone。
 
 ```bash
-python -m src.main clean-worktree --iid <MR_IID> [--project <PROJECT>]
+python -m src.main clean-clone --iid <MR_IID> --project <PROJECT>
 ```
 
 **選項:**
 - `--iid`: MR的內部編號 (必需)
-- `--project`: 專案路徑 (可選)
+- `--project`: 專案路徑 (必需)
 
 ## 7. 設定管理
 
@@ -174,7 +197,8 @@ python -m src.main clean-worktree --iid <MR_IID> [--project <PROJECT>]
 - `GITLAB_PROJECTS`: 專案列表 (逗號分隔)
 
 **可選變數:**
-- `REVIEWS_PATH`: Worktree根目錄 (預設: ~/GIT_POOL/reviews)
+- `REVIEWS_PATH`: MR clone 根目錄 (預設: ~/GIT_POOL/reviews)
+- `GITLAB_REPO_BASE`: GitLab 倉庫 base URL (預設: 從 GITLAB_URL 推導，用於 git clone)
 - `STATE_DIR`: 狀態儲存目錄 (預設: ./state)
 - `DB_PATH`: SQLite資料庫路徑 (預設: ./state/mr_state.sqlite)
 - `LOG_LEVEL`: 日誌級別 (預設: INFO)
@@ -263,7 +287,7 @@ python -m src.main clean-worktree --iid <MR_IID> [--project <PROJECT>]
 ### 12.1 常見問題
 
 - **GitLab連接失敗**: 檢查URL和Token
-- **Worktree建立失敗**: 檢查磁碟空間和權限
+- **Clone建立失敗**: 檢查磁碟空間、權限和網路連線
 - **狀態載入失敗**: 檢查資料庫完整性
 
 ## 13. 性能考量
@@ -271,14 +295,14 @@ python -m src.main clean-worktree --iid <MR_IID> [--project <PROJECT>]
 ### 13.1 優化
 
 - 快取GitLab回應
-- 分批建立worktree
-- 非同步操作支援
+- 平行 clone 多個 MR（未來）
+- 淺層 clone（`--depth 1`）可選支援
 
 ### 13.2 監控
 
 - 掃描失敗次數
 - API呼叫錯誤率
-- Worktree建立失敗
+- Clone建立失敗
 - 磁碟使用情況
 
 ## 14. 未來改進

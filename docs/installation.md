@@ -1,6 +1,6 @@
 # 安裝指南
 
-- ## 前提條件
+## 前提條件
 
 - Python 3.9 或更高版本
 - pip 或 poetry
@@ -97,8 +97,8 @@ python -m src.main --help
 # 首次掃描
 python -m src.main scan
 
-# 列出所有 worktrees
-python -m src.main list-worktrees
+# 列出所有 MR clone
+python -m src.main list-clones
 
 # 刪除特定 worktree
 python -m src.main clean-worktree <project_path> <mr_number>
