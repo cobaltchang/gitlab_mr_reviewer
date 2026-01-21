@@ -14,7 +14,7 @@ from src.state.manager import StateManager
 
 def _make_config(tmp_path):
     return Config(
-        gitlab_url="https://gitlab.com",
+        gitlab_url="https://gitlab.example.com",
         gitlab_token="token",
         projects=["group/project"],
         reviews_path=str(tmp_path / "reviews"),

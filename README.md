@@ -1,6 +1,6 @@
 # GitLab MR Reviewer
 
-自動化 GitLab MR 掃描與本地審查工具。定期掃描 https://ncs-gitlab/ 上的新 Merge Requests，自動在本地建立 git worktrees，支援增量更新，便於程式碼審查。
+自動化 GitLab MR 掃描與本地審查工具。定期掃描 https://gitlab.example.com/ 上的新 Merge Requests，自動在本地建立 git worktrees，支援增量更新，便於程式碼審查。
 
 ## 功能特性
 
