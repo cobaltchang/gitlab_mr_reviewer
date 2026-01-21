@@ -13,7 +13,7 @@ from src.gitlab_.client import GitLabClient
 from src.logger import setup_logging
 from src.scanner.mr_scanner import MRScanner
 from src.state.manager import StateManager
-from src.worktree.manager import WorktreeManager
+from src.clone.manager import CloneManager
 
 
 # 全域變數
@@ -21,13 +21,13 @@ config: Optional[Config] = None
 gitlab_client: Optional[GitLabClient] = None
 mr_scanner: Optional[MRScanner] = None
 state_manager: Optional[StateManager] = None
-worktree_manager: Optional[WorktreeManager] = None
+clone_manager: Optional[CloneManager] = None
 logger: Optional[logging.Logger] = None
 
 
 def init_app():
     """初始化應用程式"""
-    global config, gitlab_client, mr_scanner, state_manager, worktree_manager, logger
+    global config, gitlab_client, mr_scanner, state_manager, clone_manager, logger
     
     # 載入設定
     config = Config.from_env()
@@ -49,7 +49,7 @@ def init_app():
     
     state_manager = StateManager(db_path=config.db_path)
     mr_scanner = MRScanner(gitlab_client, state_manager)
-    worktree_manager = WorktreeManager(config=config, state_manager=state_manager)
+    clone_manager = CloneManager(config=config, state_manager=state_manager)
     
     logger.info("應用程式初始化完成")
 
@@ -78,7 +78,7 @@ def cli():
     help="僅顯示操作而不實際執行"
 )
 def scan(exclude_wip: bool, exclude_draft: bool, dry_run: bool):
-    """掃描 GitLab 並建立或更新 Worktree"""
+    """掃描 GitLab 並建立 MR Clone"""
     try:
         init_app()
         
@@ -106,7 +106,7 @@ def scan(exclude_wip: bool, exclude_draft: bool, dry_run: bool):
                         click.echo(f"  → {mr.project_name}#{mr.iid}: {mr.title}")
             return
         
-        # 建立或更新 worktree
+        # 建立 clone
         for result in scan_results:
             if result.error:
                 click.echo(f"✗ {result.project}: {result.error}")
@@ -115,53 +115,55 @@ def scan(exclude_wip: bool, exclude_draft: bool, dry_run: bool):
             
             for mr in result.merge_requests:
                 try:
-                    worktree_path = worktree_manager.create_worktree(mr)
-                    click.echo(f"✓ {mr.project_name}#{mr.iid}: {worktree_path}")
-                    logger.info(f"建立 worktree: {worktree_path}")
+                    clone_path = clone_manager.create_clone(mr)
+                    click.echo(f"✓ {mr.project_name}#{mr.iid}: {clone_path}")
+                    logger.info(f"建立 clone: {clone_path}")
                 except Exception as e:
                     click.echo(f"✗ {mr.project_name}#{mr.iid}: {e}")
-                    logger.error(f"建立 worktree 失敗: {e}")
+                    logger.error(f"建立 clone 失敗: {e}")
         
-        click.echo(f"✓ 掃描和 worktree 建立完成")
-        logger.info("掃描和 worktree 建立完成")
+        click.echo(f"✓ 掃描和 clone 建立完成")
+        logger.info("掃描和 clone 建立完成")
         
     except Exception as e:
         click.echo(f"✗ 錯誤: {e}", err=True)
-        logger.error(f"掃描失敗: {e}")
+        if logger:
+            logger.error(f"掃描失敗: {e}")
         exit(1)
 
 
-@cli.command()
-def list_worktrees():
-    """列出所有管理的 Worktree"""
+@cli.command("list-clones")
+def list_clones():
+    """列出所有已建立的 MR Clone"""
     try:
         init_app()
         
-        logger.info("列出所有 worktree")
+        logger.info("列出所有 clone")
         
-        worktrees = worktree_manager.list_worktrees()
+        clones = clone_manager.list_clones()
         
-        if not worktrees:
-            click.echo("沒有 worktree")
+        if not clones:
+            click.echo("沒有 clone")
             return
         
-        for project, mr_iids in worktrees.items():
+        for project, mr_iids in clones.items():
             click.echo(f"\n{project}:")
             for mr_iid in sorted(mr_iids):
-                worktree_path = worktree_manager.get_worktree_path(project, mr_iid)
-                if worktree_path:
-                    click.echo(f"  #{mr_iid}: {worktree_path}")
+                clone_path = clone_manager.get_clone_path(project, mr_iid)
+                if clone_path:
+                    click.echo(f"  #{mr_iid}: {clone_path}")
         
-        click.echo(f"\n總計: {sum(len(iids) for iids in worktrees.values())} 個 worktree")
-        logger.info(f"列出 {sum(len(iids) for iids in worktrees.values())} 個 worktree")
+        click.echo(f"\n總計: {sum(len(iids) for iids in clones.values())} 個 clone")
+        logger.info(f"列出 {sum(len(iids) for iids in clones.values())} 個 clone")
         
     except Exception as e:
         click.echo(f"✗ 錯誤: {e}", err=True)
-        logger.error(f"列出 worktree 失敗: {e}")
+        if logger:
+            logger.error(f"列出 clone 失敗: {e}")
         exit(1)
 
 
-@cli.command()
+@cli.command("clean-clone")
 @click.option(
     "--iid",
     required=True,
@@ -174,19 +176,19 @@ def list_worktrees():
     type=str,
     help="專案名稱"
 )
-def clean_worktree(iid: int, project: str):
-    """刪除指定的 Worktree"""
+def clean_clone(iid: int, project: str):
+    """刪除指定的 MR Clone"""
     try:
         init_app()
         
-        logger.info(f"刪除 worktree: {project}#{iid}")
+        logger.info(f"刪除 clone: {project}#{iid}")
         
-        # 查找對應的 MR
-        worktree_path = worktree_manager.get_worktree_path(project, iid)
+        # 查找對應的 clone
+        clone_path = clone_manager.get_clone_path(project, iid)
         
-        if not worktree_path:
-            click.echo(f"✗ Worktree 不存在: {project}#{iid}")
-            logger.warning(f"Worktree 不存在: {project}#{iid}")
+        if not clone_path:
+            click.echo(f"✗ Clone 不存在: {project}#{iid}")
+            logger.warning(f"Clone 不存在: {project}#{iid}")
             exit(1)
         
         # 建立臨時 MRInfo 以便刪除
@@ -209,18 +211,37 @@ def clean_worktree(iid: int, project: str):
             work_in_progress=False
         )
         
-        if worktree_manager.delete_worktree(mr_info):
-            click.echo(f"✓ Worktree 已刪除: {project}#{iid}")
-            logger.info(f"Worktree 已刪除: {project}#{iid}")
+        if clone_manager.delete_clone(mr_info):
+            click.echo(f"✓ Clone 已刪除: {project}#{iid}")
+            logger.info(f"Clone 已刪除: {project}#{iid}")
         else:
             click.echo(f"✗ 刪除失敗: {project}#{iid}")
-            logger.error(f"刪除 worktree 失敗: {project}#{iid}")
+            logger.error(f"刪除 clone 失敗: {project}#{iid}")
             exit(1)
         
     except Exception as e:
         click.echo(f"✗ 錯誤: {e}", err=True)
-        logger.error(f"刪除 worktree 失敗: {e}")
+        if logger:
+            logger.error(f"刪除 clone 失敗: {e}")
         exit(1)
+
+
+# 向後相容的別名命令
+@cli.command("list-worktrees", hidden=True)
+def list_worktrees():
+    """[已棄用] 請使用 list-clones"""
+    click.echo("警告: list-worktrees 已棄用，請改用 list-clones")
+    list_clones.main(standalone_mode=False)
+
+
+@cli.command("clean-worktree", hidden=True)
+@click.option("--iid", required=True, type=int)
+@click.option("--project", required=True, type=str)
+def clean_worktree(iid: int, project: str):
+    """[已棄用] 請使用 clean-clone"""
+    click.echo("警告: clean-worktree 已棄用，請改用 clean-clone")
+    ctx = click.get_current_context()
+    ctx.invoke(clean_clone, iid=iid, project=project)
 
 
 if __name__ == "__main__":

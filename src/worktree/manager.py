@@ -55,15 +55,45 @@ class WorktreeManager:
             logger.debug(f"MR: {mr_info.project_name}#{mr_info.iid}")
             logger.debug(f"分支: origin/{mr_info.source_branch}")
 
+            # 先建立基準點
+            git_repo_path = self._get_git_repo_path(mr_info)
+            if git_repo_path.exists():
+                branch_cmd = [
+                    'git',
+                    'update-ref',
+                    f'refs/head/{mr_info.target_branch}',
+                    f'origin/{mr_info.target_branch}'
+                ]
+                print(' '.join(branch_cmd))
+
+                logger.info(f"Branching {mr_info.target_branch}...")
+                self._run_git_command(branch_cmd, cwd=git_repo_path)
+            else:
+                # 建立父目錄
+                git_repo_path.parent.mkdir(parents=True, exist_ok=True)
+
+                clone_cmd = [
+                    'git',
+                    'clone',
+                    '-b',
+                    mr_info.target_branch,
+                    '--single-branch',
+                    f'git@ncs-gitlab:{mr_info.project_name}.git'
+                ]
+                print(' '.join(clone_cmd))
+
+                logger.info(f"Cloning {mr_info.project_name} branch {mr_info.target_branch}...")
+                self._run_git_command(clone_cmd, cwd=git_repo_path.parent)
+
             # 1. 先把該 MR 的特定 Ref 抓下來
             # refs/merge-requests/{iid}/head 是 GitLab 官方提供的虛擬引用
-            git_repo_path = self._get_git_repo_path(mr_info)
             fetch_cmd = [
                'git',
                'fetch',
                'origin',
                 f'refs/merge-requests/{mr_info.iid}/head'
             ]
+            print(' '.join(fetch_cmd))
             
             logger.info(f"Fetching MR !{mr_info.iid}...")
             self._run_git_command(fetch_cmd, cwd=git_repo_path)
@@ -78,6 +108,7 @@ class WorktreeManager:
                 str(worktree_path),
                 'FETCH_HEAD'
             ]
+            print(' '.join(add_cmd))
             
             self._run_git_command(add_cmd, cwd=git_repo_path)
             
@@ -131,6 +162,15 @@ class WorktreeManager:
             logger.debug(f"執行git pull更新MR !{mr_info.iid}")
 
             # 可能有 force update，先回到原本的點
+            fetch_cmd = [
+               'git',
+               'fetch',
+               'origin',
+                f'origin/{mr_info.target_branch}/'
+            ]
+            
+            self._run_git_command(fetch_cmd, cwd=worktree_path)
+
             cmd = ['git', '-C', str(worktree_path), 'reset', '--hard', mr_info.target_branch]
             self._run_git_command(cmd)
 
