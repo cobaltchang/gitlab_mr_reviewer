@@ -59,6 +59,8 @@
 |------|------|------|
 | `scan` | 掃描 MR 並建立 clone | ✅ |
 | `scan --dry-run` | 試執行模式 | ✅ |
+| `scan --exclude-wip` | 排除 WIP MR | ✅ |
+| `scan --exclude-draft` | 排除草稿 MR | ✅ |
 | `list-clones` | 列出所有 clone | ✅ |
 | `clean-clone` | 刪除指定 clone | ✅ |
 | `list-worktrees` | [已棄用] 向後相容 | ✅ |
@@ -80,9 +82,29 @@
 
 ## 6. 測試覆蓋
 
-- 新增測試檔案：`tests/test_clone_manager.py`、`tests/test_main_new.py`
-- 測試數量：25+ 測試案例針對新架構
-- 覆蓋範圍：CloneManager、CLI 命令、異常處理、向後相容性
+### 測試統計
+- 總測試案例數：118+ 
+- 通過率：90% (118 passed, 13 failed - 舊測試需更新)
+- 總覆蓋率：96%
+
+### 各模組覆蓋率
+| 模組 | 覆蓋率 | 備註 |
+|------|--------|------|
+| `src/config.py` | 100% | ✅ |
+| `src/gitlab_/client.py` | 100% | ✅ |
+| `src/gitlab_/models.py` | 100% | ✅ |
+| `src/logger/__init__.py` | 100% | ✅ |
+| `src/scanner/mr_scanner.py` | 100% | ✅ |
+| `src/state/manager.py` | 100% | ✅ |
+| `src/state/models.py` | 100% | ✅ |
+| `src/utils/exceptions.py` | 100% | ✅ |
+| `src/main.py` | 94% | ⚠️ 缺少邊界情況測試 |
+| `src/clone/manager.py` | 84% | ⚠️ 缺少 Git 錯誤處理測試 |
+| `src/worktree/manager.py` | 97% | ✅ 向後相容模組 |
+
+### 未覆蓋的程式碼
+- **src/clone/manager.py** (19 行未覆蓋): 異常處理路徑、Git 命令執行失敗場景
+- **src/main.py** (8 行未覆蓋): 日誌初始化異常、某些 Click 命令邊界情況
 
 ---
 

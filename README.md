@@ -47,6 +47,21 @@ python -m src.main clean-clone --iid <MR_IID> --project <PROJECT>
 
 # 試執行模式
 python -m src.main scan --dry-run
+ 
+ ## 測試
+ 
+ ```bash
+ # 運行所有測試
+ pytest
+ 
+ # 運行特定測試
+ pytest tests/test_config.py
+ 
+ # 查看覆蓋率
+ pytest --cov=src
+ 
+ # 測試覆蓋率
+ pytest tests/ --cov=src --cov-report=term-missing
 ```
 
 ## 開發
