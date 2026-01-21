@@ -1,0 +1,8 @@
+# GitLab 專案清單
+# 檔案格式：每行一個專案路徑 (group/project 或 subgroup/project)
+# 以 # 開頭的行視為註釋，空行會被忽略
+
+# 範例專案清單
+my-group/my-project
+my-group/another-project
+my-group/subgroup/deep-project

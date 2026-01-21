@@ -34,7 +34,9 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. 設定環境變數
+### 4. 設定環境變數和專案清單
+
+#### 4.1 複製環境變數範本
 
 ```bash
 # 複製示例設定檔案
@@ -43,11 +45,31 @@ cp .env.example .env
 # 編輯 .env 檔案，設定以下必要參數：
 # - GITLAB_URL: GitLab 執行個體 URL
 # - GITLAB_TOKEN: 個人存取令牌
-# - GITLAB_PROJECTS: 要監控的專案列表
+# - GITLAB_PROJECTS_FILE: 專案清單檔案路徑（推薦）
 nano .env
 
 # 將 .env 變數載入到環境中（每次開啟新終端都需要執行）
 export $(cat .env | grep -v '#' | xargs)
+```
+
+#### 4.2 建立專案清單檔案
+
+```bash
+# 複製範例檔案
+cp gitlab_projects.txt.example gitlab_projects.txt
+
+# 編輯檔案，每行一個專案
+nano gitlab_projects.txt
+```
+
+專案清單檔案 (`gitlab_projects.txt`) 格式：
+```
+# 註釋行以 # 開頭，會被忽略
+# 空行也會被忽略
+
+group/project1
+group/project2
+group/subgroup/project3
 ```
 
 ### 5. 生成 GitLab 個人存取令牌
