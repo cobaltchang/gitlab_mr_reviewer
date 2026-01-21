@@ -1,0 +1,24 @@
+flowchart LR
+  User[User / Maintainer]
+  GitLabAPI[GitLab API]
+  GitLabClient[GitLabClient]
+  MRScanner[MRScanner]
+  StateManager[StateManager SQLite JSON]
+  CloneManager[CloneManager]
+  Reviews[Cloned Repos]
+  CLI[CLI]
+  CI[CI]
+  SBOM[SBOM]
+
+  User -->|requests / CLI| CLI
+  CLI -->|calls| MRScanner
+  User -->|requests| GitLabAPI
+  GitLabAPI -->|API responses| GitLabClient
+  GitLabClient --> MRScanner
+  MRScanner -->|store state| StateManager
+  MRScanner -->|create clone| CloneManager
+  CloneManager --> Reviews
+  Reviews -->|local files| CLI
+  CI -->|runs scans| SBOM
+  SBOM --> CI
+  CI -->|uploads artifacts| Reviews
