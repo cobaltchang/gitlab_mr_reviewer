@@ -1,0 +1,14 @@
+[run]
+omit =
+	# 已廢棄的 worktree 模組
+	src/worktree/*
+	# 測試檔案
+	tests/*
+	# __pycache__
+	*/__pycache__/*
+
+[report]
+precision = 2
+skip_covered = False
+show_missing = True
+
