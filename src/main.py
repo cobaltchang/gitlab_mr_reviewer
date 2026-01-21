@@ -226,22 +226,7 @@ def clean_clone(iid: int, project: str):
         exit(1)
 
 
-# 向後相容的別名命令
-@cli.command("list-worktrees", hidden=True)
-def list_worktrees():
-    """[已棄用] 請使用 list-clones"""
-    click.echo("警告: list-worktrees 已棄用，請改用 list-clones")
-    list_clones.main(standalone_mode=False)
-
-
-@cli.command("clean-worktree", hidden=True)
-@click.option("--iid", required=True, type=int)
-@click.option("--project", required=True, type=str)
-def clean_worktree(iid: int, project: str):
-    """[已棄用] 請使用 clean-clone"""
-    click.echo("警告: clean-worktree 已棄用，請改用 clean-clone")
-    ctx = click.get_current_context()
-    ctx.invoke(clean_clone, iid=iid, project=project)
+# Deprecated worktree commands removed
 
 
 if __name__ == "__main__":

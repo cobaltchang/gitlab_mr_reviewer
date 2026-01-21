@@ -5,7 +5,6 @@
 from .exceptions import (
     ConfigError,
     GitLabError,
-    WorktreeError,
     StateError,
     GitError
 )
@@ -13,7 +12,6 @@ from .exceptions import (
 __all__ = [
     'ConfigError',
     'GitLabError',
-    'WorktreeError',
     'StateError',
     'GitError',
 ]

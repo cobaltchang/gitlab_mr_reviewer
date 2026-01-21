@@ -1,7 +1,9 @@
 [run]
 omit =
-	# 已廢棄的 worktree 模組
-	src/worktree/*
+	# 測試檔案
+	tests/*
+	# __pycache__
+	*/__pycache__/*
 	# 測試檔案
 	tests/*
 	# __pycache__
