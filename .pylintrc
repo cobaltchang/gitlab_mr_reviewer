@@ -8,6 +8,7 @@ init-hook='import sys; sys.path.insert(0, ".")'
 [MESSAGES CONTROL]
 # Only fail on errors, not warnings or conventions
 # This allows the CI to pass while still providing feedback on code quality
+# Specific warnings can be enabled incrementally as the codebase improves
 disable=
     C,  # Convention messages
     R,  # Refactoring messages
