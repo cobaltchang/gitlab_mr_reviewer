@@ -259,5 +259,4 @@ class CloneManager:
             raise GitError(f"執行 git 命令失敗: {e}")
 
 
-# 向後相容別名
-WorktreeManager = CloneManager
+# (worktree support removed; use CloneManager)

@@ -158,15 +158,4 @@ class TestCleanCloneCommand:
 
 class TestBackwardCompatibility:
     """向後相容性測試"""
-    
-    @patch('src.main.init_app')
-    @patch('src.main.clone_manager')
-    @patch('src.main.logger')
-    def test_list_worktrees_deprecated(self, mock_logger, mock_clone_manager, mock_init, runner):
-        """測試 list-worktrees 已棄用警告"""
-        mock_clone_manager.list_clones.return_value = {}
-        
-        result = runner.invoke(cli, ['list-worktrees'])
-        
-        # 應該顯示棄用警告
-        assert '已棄用' in result.output or '警告' in result.output
+    # backward compatibility with worktree commands removed

@@ -18,8 +18,7 @@ class CloneError(Exception):
     pass
 
 
-# 保留別名以維持向後相容
-WorktreeError = CloneError
+# Note: deprecated WorktreeError alias removed
 
 
 class StateError(Exception):

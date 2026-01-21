@@ -270,28 +270,6 @@ class TestMainExceptionPaths:
         assert result.exit_code == 1
         assert "錯誤" in result.output
     
-    def test_clean_worktree_deprecated_command(self, monkeypatch):
-        """測試已棄用的 clean-worktree 命令"""
-        def fake_init():
-            import src.main as main
-            main.logger = Mock()
-            main.config = Mock()
-            main.gitlab_client = Mock()
-            
-            mr_info = MagicMock()
-            mr_info.project_name = "test/proj"
-            mr_info.iid = 99
-            
-            main.gitlab_client.get_mr_details.return_value = mr_info
-            main.clone_manager = Mock()
-            main.clone_manager.delete_clone.return_value = True
-        
-        monkeypatch.setattr('src.main.init_app', fake_init)
-        
-        runner = CliRunner()
-        result = runner.invoke(cli, ["clean-worktree", "--iid", "99", "--project", "test/proj"])
-        assert "警告" in result.output
-        assert "已棄用" in result.output
 
 
 class TestCloneManagerGetRepoUrl:
