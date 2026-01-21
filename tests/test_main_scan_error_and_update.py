@@ -23,7 +23,7 @@ def test_scan_handles_scanresult_error(monkeypatch, cli_runner):
         main.config = SimpleNamespace(projects=["group/proj"])
         main.mr_scanner = SimpleNamespace()
         main.mr_scanner.scan = lambda projects, exclude_wip, exclude_draft: [SimpleNamespace(project="group/proj", merge_requests=[], error="api failed")]
-        main.worktree_manager = SimpleNamespace()
+        main.clone_manager = SimpleNamespace()
 
     monkeypatch.setattr('src.main.init_app', fake_init)
 
@@ -32,7 +32,7 @@ def test_scan_handles_scanresult_error(monkeypatch, cli_runner):
     assert "✗ group/proj: api failed" in result.output
 
 
-def test_scan_create_worktree_exception(monkeypatch, cli_runner):
+def test_scan_create_clone_exception(monkeypatch, cli_runner):
     def fake_init():
         import src.main as main
         main.logger = Mock()
@@ -40,9 +40,9 @@ def test_scan_create_worktree_exception(monkeypatch, cli_runner):
         main.mr_scanner = SimpleNamespace()
         mr = SimpleNamespace(project_name="group/proj", iid=99, title="t", source_branch="f", target_branch="m")
         main.mr_scanner.scan = lambda projects, exclude_wip, exclude_draft: [SimpleNamespace(project="group/proj", merge_requests=[mr], error=None)]
-        wm = Mock()
-        wm.create_worktree.side_effect = Exception('create failed')
-        main.worktree_manager = wm
+        cm = Mock()
+        cm.create_clone.side_effect = Exception('create failed')
+        main.clone_manager = cm
 
     monkeypatch.setattr('src.main.init_app', fake_init)
 
