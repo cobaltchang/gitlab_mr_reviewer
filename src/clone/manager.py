@@ -50,6 +50,7 @@ class CloneManager:
         Raises:
             CloneError: clone 建立失敗
         """
+        clone_path = None
         try:
             clone_path = self._get_clone_path(mr_info)
             
@@ -116,12 +117,12 @@ class CloneManager:
         
         except GitError as e:
             # 清理可能的殘留目錄
-            if clone_path.exists():
+            if clone_path and clone_path.exists():
                 shutil.rmtree(clone_path, ignore_errors=True)
             logger.error(f"建立 clone 失敗: {e}")
             raise CloneError(f"建立 clone 失敗: {e}")
         except Exception as e:
-            if clone_path.exists():
+            if clone_path and clone_path.exists():
                 shutil.rmtree(clone_path, ignore_errors=True)
             logger.error(f"建立 clone 失敗: {e}")
             raise CloneError(f"建立 clone 失敗: {e}")
