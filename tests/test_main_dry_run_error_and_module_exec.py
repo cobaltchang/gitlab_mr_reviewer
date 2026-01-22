@@ -24,7 +24,7 @@ def test_scan_dry_run_shows_errors(monkeypatch, cli_runner):
         main.config = SimpleNamespace(projects=["group/proj"])
         main.mr_scanner = SimpleNamespace()
         main.mr_scanner.scan = lambda projects, exclude_wip, exclude_draft: [SimpleNamespace(project="group/proj", merge_requests=[], error="api fail")]
-        main.worktree_manager = SimpleNamespace()
+        main.clone_manager = SimpleNamespace()
 
     monkeypatch.setattr('src.main.init_app', fake_init)
 

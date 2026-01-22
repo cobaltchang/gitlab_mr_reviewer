@@ -226,7 +226,7 @@ def clean_clone(iid: int, project: str):
         exit(1)
 
 
-# Deprecated worktree commands removed
+# Deprecated commands removed
 
 
 if __name__ == "__main__":

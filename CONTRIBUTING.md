@@ -26,7 +26,7 @@ GitLab MR Reviewer 是一個自動化的 Merge Request 審查工具，用於簡�
 
 本專案維持嚴格的覆蓋率政策以確保核心邏輯的健全性。
 
-- 覆蓋範圍: `src` 目錄（已在 `.coveragerc` 中排除已棄用的 `src/worktree/`）
+- 覆蓋範圍: `src` 目錄（如有已棄用模組請記錄理由，舊有遺留模組已被移除）
 - 目標: **100%**（所有受測模組在 `src` 中皆達到覆蓋）
 - 新增或修改程式碼時，必須同時新增/更新測試以維持此標準
 
@@ -41,7 +41,7 @@ open htmlcov/index.html
 ```
 
 實務與例外:
-- 已棄用或遺留模組 （例如 `src/worktree/`）可在 `.coveragerc` 中列為 omit；omit 必須在 PR 中說明理由。
+- 已棄用或遺留模組可在 `.coveragerc` 中列為 omit；omit 必須在 PR 中說明理由。注意：舊有遺留模組已被移除且不再維護。
 - 防禦性極罕見的分支（例如用於清理殘留檔案的 `ignore_errors=True` 路徑）若測試成本過高，可納入討論並由核心維護者決定是否以 `# pragma: no cover` 或其他方式排除。
 - CI 構建應設定最低覆蓋率門檻（建議 `100%`），或至少在 PR 審查時明確標註任何減低覆蓋率的變更。
 所有功能開發必須遵循 Red → Green → Refactor 流程：

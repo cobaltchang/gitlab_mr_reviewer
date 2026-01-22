@@ -1,5 +1,7 @@
 # 安裝指南
 
+> 注意：本專案使用每個 MR 獨立的單分支 clone（由 CloneManager 管理）。舊有的實作已移除。
+
 ## 前提條件
 
 - Python 3.9 或更高版本
@@ -100,8 +102,8 @@ python -m src.main scan
 # 列出所有 MR clone
 python -m src.main list-clones
 
-# 刪除特定 worktree
-python -m src.main clean-worktree <project_path> <mr_number>
+# 刪除特定 clone
+python -m src.main clean-clone --project <project_path> --iid <mr_number>
 ```
 
 ## 故障排除
@@ -118,7 +120,7 @@ python -m src.main clean-worktree <project_path> <mr_number>
 - 檢查令牌是否過期（GitLab 可設定令牌有效期）
 - 檢查令牌權限是否足夠
 
-### Worktree 建立失敗
+### Clone 建立失敗
 
 - 檢查 `REVIEWS_PATH` 目錄是否有寫權限
 - 檢查磁碟空間是否充足

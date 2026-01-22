@@ -18,7 +18,7 @@ class CloneError(Exception):
     pass
 
 
-# Note: deprecated WorktreeError alias removed
+# Note: deprecated aliases removed; use `CloneError` instead
 
 
 class StateError(Exception):

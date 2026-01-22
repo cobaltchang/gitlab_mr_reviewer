@@ -281,4 +281,4 @@ class CloneManager:
             raise GitError(f"執行 git 命令失敗: {e}")
 
 
-# (worktree support removed; use CloneManager)
+# (legacy support removed; use CloneManager)
