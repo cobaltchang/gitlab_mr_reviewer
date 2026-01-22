@@ -40,7 +40,7 @@ class Config:
           - GITLAB_PROJECTS: 逗號分隔的專案清單（向後相容）
         
         可選環境變數:
-        - REVIEWS_PATH: Worktree 根目錄 (預設: ~/GIT_POOL/reviews)
+        - REVIEWS_PATH: MR clone 根目錄 (預設: ~/GIT_POOL/reviews)
         - STATE_DIR: 狀態儲存目錄 (預設: ./state)
         - DB_PATH: SQLite 資料庫路徑
         - GITLAB_SSL_VERIFY: SSL 驗證 (預設: true)

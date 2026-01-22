@@ -24,10 +24,10 @@ def test_init_app_sets_globals(monkeypatch):
     monkeypatch.setattr('src.main.Config.from_env', lambda: fake_config)
     monkeypatch.setattr('src.main.setup_logging', lambda log_level, log_dir: Mock())
 
-    # Patch GitLabClient, StateManager, MRScanner, WorktreeManager to simple mocks
+    # Patch GitLabClient, StateManager, MRScanner, CloneManager to simple mocks
     monkeypatch.setattr('src.main.GitLabClient', lambda url, token, ssl_verify: Mock())
     monkeypatch.setattr('src.main.StateManager', lambda db_path: Mock())
-    # MRScanner and WorktreeManager will be instantiated in init_app; allow defaults
+    # MRScanner and CloneManager will be instantiated in init_app; allow defaults
 
     # Call init_app
     main.init_app()
@@ -36,4 +36,4 @@ def test_init_app_sets_globals(monkeypatch):
     assert main.gitlab_client is not None
     assert main.state_manager is not None
     assert main.mr_scanner is not None
-    assert main.worktree_manager is not None
+    assert main.clone_manager is not None

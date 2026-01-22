@@ -4,7 +4,7 @@
 
 This project enforces strict test coverage requirements for core logic.
 
-- Scope: the `src` directory (deprecated `src/worktree/` is omitted via `.coveragerc`).
+- Scope: the `src` directory (legacy modules have been removed from the codebase).
 - Target: **100%** coverage for `src`.
 - When adding or modifying code, add/update tests to maintain coverage.
 
@@ -58,7 +58,7 @@ Alternatively, use the `pre-commit` framework or CI pipeline to enforce this req
 
 Python CLI tool for automated GitLab MR scanning and local code review setup. Creates isolated `git clone --single-branch` copies for each MR, enabling parallel review workflows without modifying the primary repository.
 
-**Key difference from worktrees**: Uses fresh clones (simpler, no force-push issues) instead of git worktree refs.
+**Key difference**: Uses fresh clones (simpler, no force-push issues) instead of workarounds that require a primary repository.
 
 ## Architecture
 
@@ -107,7 +107,7 @@ Config.from_env()
 Use custom exceptions from [src/utils/exceptions.py](src/utils/exceptions.py):
 - `ConfigError`: Invalid/missing config
 - `GitLabError`: API failures
-- `CloneError`: Clone operation failures (alias: `WorktreeError` for backwards compatibility)
+- `CloneError`: Clone operation failures. Note: deprecated aliases removed; use `CloneError`.
 - `StateError`: Database/JSON persistence failures
 - `GitError`: Git command execution failures
 

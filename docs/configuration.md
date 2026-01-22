@@ -47,7 +47,7 @@ Clone 目錄結構：
 ```
 ~/GIT_POOL/reviews/
 ├── group/project1/
-│   ├── 1/        # MR#1 的 worktree
+│   ├── 1/        # MR#1 的 clone
 │   ├── 2/
 │   └── 3/
 └── group/project2/
@@ -195,11 +195,11 @@ DEBUG=false  # 禁用除錯模式
 ```
 
 #### AUTO_CLEAN_MERGED
-是否自動清理已合併 MR 的 worktree。
+是否自動清理已合併 MR 的 clone。
 
 ```bash
 AUTO_CLEAN_MERGED=true   # 自動清理
-AUTO_CLEAN_MERGED=false  # 保留已合併 MR 的 worktree
+AUTO_CLEAN_MERGED=false  # 保留已合併 MR 的 clone
 ```
 
 #### CONNECTION_TIMEOUT

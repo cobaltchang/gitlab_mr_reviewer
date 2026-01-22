@@ -158,4 +158,4 @@ class TestCleanCloneCommand:
 
 class TestBackwardCompatibility:
     """向後相容性測試"""
-    # backward compatibility with worktree commands removed
+    # backward compatibility with legacy commands removed

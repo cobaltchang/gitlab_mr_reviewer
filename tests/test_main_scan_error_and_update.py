@@ -1,5 +1,5 @@
 """
-測試 CLI scan 處理 ScanResult.error 與 create_worktree 拋例外的情形
+測試 CLI scan 處理 ScanResult.error 與 create_clone 拋例外的情形
 """
 
 from types import SimpleNamespace

@@ -33,8 +33,7 @@ class TestExceptions:
         error = GitLabError("API 呼叫失敗: 401 Unauthorized")
         assert "401" in str(error)
 
-    def test_worktree_error(self):
-        # WorktreeError removed; ensure CloneError exists instead
+    def test_clone_error(self):
         from src.utils.exceptions import CloneError
         with pytest.raises(CloneError):
             raise CloneError("Clone 建立失敗")

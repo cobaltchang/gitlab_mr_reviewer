@@ -46,7 +46,7 @@
 
 ### 3.2 設計決策
 
-採用 `git clone --single-branch` 而非 `git worktree` 的原因：
+採用 `git clone --single-branch` 的原因：
 - **簡化依賴**：不需要預先存在的主倉庫
 - **避免 force-push 問題**：重新 clone 即可取得最新狀態
 - **隔離性更好**：每個 MR 完全獨立
@@ -63,8 +63,7 @@
 | `scan --exclude-draft` | 排除草稿 MR | ✅ |
 | `list-clones` | 列出所有 clone | ✅ |
 | `clean-clone` | 刪除指定 clone | ✅ |
-| `list-worktrees` | [已棄用] 向後相容 | ✅ |
-| `clean-worktree` | [已棄用] 向後相容 | ✅ |
+
 
 ---
 
@@ -83,9 +82,9 @@
 ## 6. 測試覆蓋
 
 ### 測試統計
-- 總測試案例數：118+ 
-- 通過率：90% (118 passed, 13 failed - 舊測試需更新)
-- 總覆蓋率：96%
+- 總測試案例數：114
+- 通過率：100% (114 passed)
+- 總覆蓋率：100%
 
 ### 各模組覆蓋率
 | 模組 | 覆蓋率 | 備註 |
@@ -98,15 +97,14 @@
 | `src/state/manager.py` | 100% | ✅ |
 | `src/state/models.py` | 100% | ✅ |
 | `src/utils/exceptions.py` | 100% | ✅ |
-| `src/main.py` | 94% | ⚠️ 缺少邊界情況測試 |
-| `src/clone/manager.py` | 84% | ⚠️ 缺少 Git 錯誤處理測試 |
-| `src/worktree/manager.py` | 97% | ✅ 向後相容模組 |
+| `src/main.py` | 100% | ✅ |
+| `src/clone/manager.py` | 100% | ✅ |
+| (legacy module removed) | n/a | ✅ removed; use `src/clone/manager.py` |
 
 ### 未覆蓋的程式碼
-- **src/clone/manager.py** (19 行未覆蓋): 異常處理路徑、Git 命令執行失敗場景
-- **src/main.py** (8 行未覆蓋): 日誌初始化異常、某些 Click 命令邊界情況
+- 無：`src` 內所有程式碼均已被測試覆蓋（100%）。
 
 ---
 
 版本: 1.0.0
-最後更新: 2026-01-21
+最後更新: 2026-01-22
