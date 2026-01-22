@@ -27,6 +27,26 @@ jobs:
       - name: Run pip-audit
         run: pip-audit -f json -o pip_audit_weekly.json || true
 
+      - name: Create issue for pip-audit findings
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'pip_audit_weekly.json';
+            if (!fs.existsSync(path)) { core.info('No pip audit report found'); return; }
+            const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const deps = data.dependencies || [];
+            const vulns = deps.filter(d => Array.isArray(d.vulns) && d.vulns.length > 0);
+            if (vulns.length === 0) { core.info('No vulnerabilities found'); return; }
+            const body = `Automated weekly pip-audit found ${vulns.length} vulnerable dependencies.\n\nSee pip_audit_weekly.json attached to the workflow run for details.\n\nSummary:\n` + JSON.stringify(vulns.map(d => ({name: d.name, version: d.version, vulns: d.vulns.map(v=>v.id)})), null, 2);
+            await github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Automated Security: pip-audit found ${vulns.length} vulnerable dependencies`,
+              body: body,
+              labels: ['security','automated']
+            });
+
       - name: Run bandit
         run: bandit -r src/ -f json -o bandit_weekly.json || true
 
