@@ -2,7 +2,7 @@
 pytest>=7.0.0
 pytest-mock>=3.10.0
 pytest-timeout>=2.0.0
-pip-audit>=2.0.0
+pip-audit==2.9.0
 bandit>=1.7.0
 cyclonedx-bom>=7.0.0
 
