@@ -38,7 +38,7 @@ class TestCLIScanCommand:
         result = cli_runner.invoke(cli, ["scan", "--help"])
         
         assert result.exit_code == 0
-        assert "掃描 GitLab 並建立或更新 Worktree" in result.output
+        assert "掃描 GitLab 並建立 MR Clone" in result.output
         assert "--exclude-wip" in result.output
         assert "--exclude-draft" in result.output
         assert "--dry-run" in result.output
@@ -49,10 +49,10 @@ class TestCLIListCommand:
     
     def test_list_help(self, cli_runner):
         """測試列表命令幫助"""
-        result = cli_runner.invoke(cli, ["list-worktrees", "--help"])
+        result = cli_runner.invoke(cli, ["list-clones", "--help"])
         
         assert result.exit_code == 0
-        assert "列出所有管理的 Worktree" in result.output
+        assert "列出所有已建立的 MR Clone" in result.output
 
 
 class TestCLICleanCommand:
@@ -60,10 +60,10 @@ class TestCLICleanCommand:
     
     def test_clean_help(self, cli_runner):
         """測試清理命令幫助"""
-        result = cli_runner.invoke(cli, ["clean-worktree", "--help"])
+        result = cli_runner.invoke(cli, ["clean-clone", "--help"])
         
         assert result.exit_code == 0
-        assert "刪除指定的 Worktree" in result.output
+        assert "刪除指定的 MR Clone" in result.output
         assert "--iid" in result.output
         assert "--project" in result.output
 
@@ -77,11 +77,11 @@ class TestCLIStructure:
         assert "scan" in result.output
     
     def test_list_command_exists(self, cli_runner):
-        """測試 list-worktrees 命令存在"""
+        """測試 list-clones 命令存在"""
         result = cli_runner.invoke(cli, ["--help"])
-        assert "list-worktrees" in result.output
+        assert "list-clones" in result.output
     
     def test_clean_command_exists(self, cli_runner):
-        """測試 clean-worktree 命令存在"""
+        """測試 clean-clone 命令存在"""
         result = cli_runner.invoke(cli, ["--help"])
-        assert "clean-worktree" in result.output
+        assert "clean-clone" in result.output

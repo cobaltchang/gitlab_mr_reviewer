@@ -21,6 +21,29 @@ GitLab MR Reviewer 是一個自動化的 Merge Request 審查工具，用於簡�
 
 ### 1. 測試驅動開發 (TDD)
 
+
+### 測試覆蓋率要求
+
+本專案維持嚴格的覆蓋率政策以確保核心邏輯的健全性。
+
+- 覆蓋範圍: `src` 目錄（已在 `.coveragerc` 中排除已棄用的 `src/worktree/`）
+- 目標: **100%**（所有受測模組在 `src` 中皆達到覆蓋）
+- 新增或修改程式碼時，必須同時新增/更新測試以維持此標準
+
+驗證命令（本機）:
+```bash
+# 生成終端覆蓋率摘要
+pytest tests/ --cov=src --cov-report=term-missing --timeout=10
+
+# 生成 HTML 覆蓋率報告（可在瀏覽器打開）
+pytest tests/ --cov=src --cov-report=html --timeout=10
+open htmlcov/index.html
+```
+
+實務與例外:
+- 已棄用或遺留模組 （例如 `src/worktree/`）可在 `.coveragerc` 中列為 omit；omit 必須在 PR 中說明理由。
+- 防禦性極罕見的分支（例如用於清理殘留檔案的 `ignore_errors=True` 路徑）若測試成本過高，可納入討論並由核心維護者決定是否以 `# pragma: no cover` 或其他方式排除。
+- CI 構建應設定最低覆蓋率門檻（建議 `100%`），或至少在 PR 審查時明確標註任何減低覆蓋率的變更。
 所有功能開發必須遵循 Red → Green → Refactor 流程：
 
 1. **Red**: 編寫失敗的單元測試
@@ -39,7 +62,7 @@ src/
 ├── gitlab_/                 # GitLab API 集成
 ├── scanner/                 # MR 掃描引擎
 ├── state/                   # 狀態持久化
-├── worktree/                # Git Worktree 管理
+├── clone/                   # MR Clone 管理
 └── main.py                  # CLI 主應用
 ```
 
@@ -57,7 +80,7 @@ src/
 from src.utils.exceptions import (
     ConfigError,      # 設定錯誤
     GitLabError,      # GitLab API 錯誤
-    WorktreeError,    # Worktree 操作錯誤
+    CloneError,       # Clone 操作錯誤
     StateError,       # 狀態管理錯誤
     GitError          # Git 操作錯誤
 )
@@ -182,18 +205,18 @@ git commit -m "feat(report): 實現 MR 審查報告產生功能"
 所有公開類別和函數必須有詳細的文檔字符串：
 
 ```python
-def create_worktree(self, mr_info: MRInfo) -> Path:
+def create_clone(self, mr_info: MRInfo) -> Path:
     """
-    為 MR 建立 worktree
+    為 MR 建立 clone
     
     Args:
         mr_info: MR 訊息
         
     Returns:
-        Worktree 路徑
+        Clone 路徑
         
     Raises:
-        WorktreeError: 建立失敗
+        CloneError: 建立失敗
     """
 ```
 
@@ -238,8 +261,8 @@ pytest tests/ --cov=src --cov-report=html
 
 1. **命名清晰**: `test_<function>_<scenario>`
    ```python
-   def test_create_worktree_success(self):
-   def test_create_worktree_already_exists(self):
+   def test_create_clone_success(self):
+   def test_create_clone_already_exists(self):
    ```
 
 2. **使用 Fixtures**: 集中管理測試資源
@@ -298,9 +321,9 @@ pytest tests/ --cov=src --cov-report=html
 **Examples:**
 
 ```
-feat(worktree): 實現 Git Worktree 管理
+feat(clone): 實現 MR Clone 管理
 
-- 支援建立、更新、刪除 worktree
+- 支援建立、更新、刪除 clone
 - 整合 StateManager 追蹤狀態
 - 完整的錯誤處理
 

@@ -7,7 +7,6 @@ import pytest
 from src.utils.exceptions import (
     ConfigError,
     GitLabError,
-    WorktreeError,
     StateError,
     GitError,
 )
@@ -35,9 +34,10 @@ class TestExceptions:
         assert "401" in str(error)
 
     def test_worktree_error(self):
-        """WorktreeError 可以正確拋出"""
-        with pytest.raises(WorktreeError):
-            raise WorktreeError("Worktree 建立失敗")
+        # WorktreeError removed; ensure CloneError exists instead
+        from src.utils.exceptions import CloneError
+        with pytest.raises(CloneError):
+            raise CloneError("Clone 建立失敗")
 
     def test_state_error(self):
         """StateError 可以正確拋出"""
@@ -54,7 +54,6 @@ class TestExceptions:
         exceptions = [
             ConfigError,
             GitLabError,
-            WorktreeError,
             StateError,
             GitError,
         ]

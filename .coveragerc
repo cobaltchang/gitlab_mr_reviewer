@@ -1,0 +1,16 @@
+[run]
+omit =
+	# 測試檔案
+	tests/*
+	# __pycache__
+	*/__pycache__/*
+	# 測試檔案
+	tests/*
+	# __pycache__
+	*/__pycache__/*
+
+[report]
+precision = 2
+skip_covered = False
+show_missing = True
+

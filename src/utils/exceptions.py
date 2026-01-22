@@ -13,9 +13,12 @@ class GitLabError(Exception):
     pass
 
 
-class WorktreeError(Exception):
-    """Worktree 操作錯誤"""
+class CloneError(Exception):
+    """Clone 操作錯誤"""
     pass
+
+
+# Note: deprecated WorktreeError alias removed
 
 
 class StateError(Exception):
