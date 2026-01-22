@@ -1,0 +1,84 @@
+name: Reusable Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      requirements-path:
+        required: false
+        type: string
+        default: 'requirements.txt'
+      dev-requirements-path:
+        required: false
+        type: string
+        default: 'dev-requirements.txt'
+      run-tests:
+        required: false
+        type: boolean
+        default: true
+      create-prs:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dev tools
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f "${{ inputs.dev-requirements-path }}" ]; then pip install -r "${{ inputs.dev-requirements-path }}"; fi
+
+      - name: Run tests (optional)
+        if: ${{ inputs.run-tests }}
+        run: pytest tests/ --cov=src --cov-report=term-missing
+
+      - name: Run pip-audit
+        id: pip_audit
+        run: |
+          pip-audit -r "${{ inputs.requirements-path }}" -f json -o pip_audit_report.json || true
+
+      - name: Generate SBOM
+        run: |
+          pip install cyclonedx-bom
+          cyclonedx-py requirements "${{ inputs.requirements-path }}" -o sbom.json || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-artifacts
+          path: |
+            pip_audit_report.json
+            sbom.json
+
+      - name: Create issues for findings
+        if: ${{ always() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('pip_audit_report.json')) return;
+            const data = JSON.parse(fs.readFileSync('pip_audit_report.json', 'utf8'));
+            if (!data || data.length === 0) return;
+            const vulnCount = data.length;
+            const body = `Automated scan found ${vulnCount} vulnerable dependencies. See attached pip_audit_report.json and sbom.json.`;
+            await github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `security: ${vulnCount} vulnerable dependencies detected by workflow`,
+              body,
+            });
+
+      - name: Create PRs for upgrades (optional)
+        if: ${{ inputs.create-prs }}
+        run: |
+          echo "Creating upgrade PRs is enabled. This step requires a repo token with write access."
+          # Implement per-repo policies here (e.g., use `peter-evans/create-pull-request` to open branch+PR)
