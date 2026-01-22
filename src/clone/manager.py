@@ -281,3 +281,6 @@ class CloneManager:
 
 
 # (worktree support removed; use CloneManager)
+
+# Backwards compatibility alias: older code expected `WorktreeManager` in this module.
+WorktreeManager = CloneManager
