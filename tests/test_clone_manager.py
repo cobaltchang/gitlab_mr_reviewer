@@ -94,14 +94,16 @@ class TestCloneManager:
         expected_path = Path(config.reviews_path).expanduser() / "group/project" / "42"
         assert clone_path == expected_path
         
-        # 驗證 git clone 被呼叫
-        mock_git.assert_called_once()
-        call_args = mock_git.call_args[0][0]
-        assert call_args[0] == 'git'
-        assert call_args[1] == 'clone'
-        assert '-b' in call_args
-        assert 'feature/test' in call_args
-        assert '--single-branch' in call_args
+        # 驗證 git clone + fetch + checkout 被呼叫
+        assert mock_git.call_count == 3
+
+        # 第一個呼叫應為 clone，使用 target_branch
+        first_call_args = mock_git.call_args_list[0][0][0]
+        assert first_call_args[0] == 'git'
+        assert first_call_args[1] == 'clone'
+        assert '-b' in first_call_args
+        assert mr_info.target_branch in first_call_args
+        assert '--single-branch' in first_call_args
     
     @patch.object(CloneManager, '_run_git_command')
     def test_create_clone_removes_existing_dir(self, mock_git, clone_manager, mr_info, config):
@@ -112,8 +114,8 @@ class TestCloneManager:
         
         result = clone_manager.create_clone(mr_info)
         
-        # 應該呼叫 git clone（舊目錄已被刪除）
-        mock_git.assert_called_once()
+        # 應該呼叫 git clone + fetch + checkout（舊目錄已被刪除）
+        assert mock_git.call_count == 3
     
     @patch.object(CloneManager, '_run_git_command')
     def test_create_clone_saves_metadata(self, mock_git, clone_manager, mr_info, config):

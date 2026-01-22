@@ -38,7 +38,7 @@ class CloneManager:
         """
         為 MR 建立 clone
         
-        使用 git clone -b <source_branch> --single-branch 建立獨立副本。
+        使用 git clone -b <target_branch> --single-branch 建立獨立副本。
         若目錄已存在則先刪除再重新 clone。
         
         Args:
@@ -63,14 +63,14 @@ class CloneManager:
             
             logger.info(f"建立 clone: {clone_path}")
             logger.debug(f"MR: {mr_info.project_name}#{mr_info.iid}")
-            logger.debug(f"分支: {mr_info.source_branch}")
+            logger.debug(f"分支: refs/merge-requests/{mr_info.iid}/head")
             
             # 建構 git clone 命令
             repo_url = self._get_repo_url(mr_info)
             clone_cmd = [
                 'git',
                 'clone',
-                '-b', mr_info.source_branch,
+                '-b', mr_info.target_branch,
                 '--single-branch',
                 repo_url,
                 str(clone_path)
@@ -81,6 +81,27 @@ class CloneManager:
             
             # 確保目錄存在（git clone 會建立，但以防萬一）
             clone_path.mkdir(parents=True, exist_ok=True)
+
+            # refs/merge-requests/{iid}/head 是 GitLab 官方提供的虛擬引用
+            fetch_cmd = [
+               'git',
+               'fetch',
+               'origin',
+                f'refs/merge-requests/{mr_info.iid}/head'
+            ]
+            
+            logger.info(f"執行: {' '.join(fetch_cmd)}")
+            self._run_git_command(fetch_cmd, cwd=clone_path)
+            
+            # 切到 MR 的 branch
+            checkout_cmd = [
+               'git',
+               'checkout',
+                'FETCH_HEAD'
+            ]
+            
+            logger.info(f"執行: {' '.join(checkout_cmd)}")
+            self._run_git_command(checkout_cmd, cwd=clone_path)
             
             # 保存元資料
             self._save_mr_metadata(mr_info, clone_path)
