@@ -1,0 +1,43 @@
+name: PR Security Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dev tools
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+
+      - name: Run tests
+        run: pytest tests/ --cov=src --cov-report=term-missing
+
+      - name: Run pip-audit
+        id: pip_audit
+        run: |
+          pip-audit -r requirements.txt -f json -o pip_audit_pr.json || true
+
+      - name: Generate SBOM
+        run: |
+          pip install cyclonedx-bom
+          cyclonedx-py requirements requirements.txt -o sbom.json || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-artifacts
+          path: |
+            pip_audit_pr.json
+            sbom.json
